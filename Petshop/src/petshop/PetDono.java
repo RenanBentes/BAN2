@@ -1,20 +1,16 @@
 package petshop;
 
-import java.util.Date;
-
 public class PetDono {
     private int idPet;
     private int idCliente;
-    private Date dataInicio;
-    private Date dataFim;
 
-    public PetDono(int idPet, int idCliente, Date dataInicio, Date dataFim) {
+    // Construtores
+    public PetDono(int idPet, int idCliente) {
         this.idPet = idPet;
         this.idCliente = idCliente;
-        this.dataInicio = dataInicio;
-        this.dataFim = dataFim;
     }
 
+    // Getters e Setters
     public int getIdPet() {
         return idPet;
     }
@@ -31,21 +27,12 @@ public class PetDono {
         this.idCliente = idCliente;
     }
 
-    public Date getDataInicio() {
-        return dataInicio;
+    // Sobrescrevendo o método toString para facilitar a exibição dos dados
+    @Override
+    public String toString() {
+        return "PetDono{" +
+                "idPet=" + idPet +
+                ", idCliente=" + idCliente +
+                '}';
     }
-
-    public void setDataInicio(Date dataInicio) {
-        this.dataInicio = dataInicio;
-    }
-
-    public Date getDataFim() {
-        return dataFim;
-    }
-
-    public void setDataFim(Date dataFim) {
-        this.dataFim = dataFim;
-    }
-
-    // Implementar os métodos CRUD
 }

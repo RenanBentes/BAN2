@@ -1,6 +1,12 @@
 package petshop;
 
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
+import main.Conexao;
 
 public class ServicoRealizado {
     private int idServico;
@@ -10,8 +16,10 @@ public class ServicoRealizado {
     private int idPet;
     private String status;
 
-    public ServicoRealizado(int idServico, Date data, int idDescricaoServico, int idCliente, int idPet, String status) {
-        this.idServico = idServico;
+    // Construtores
+    public ServicoRealizado() {}
+
+    public ServicoRealizado(Date data, int idDescricaoServico, int idCliente, int idPet, String status) {
         this.data = data;
         this.idDescricaoServico = idDescricaoServico;
         this.idCliente = idCliente;
@@ -19,6 +27,7 @@ public class ServicoRealizado {
         this.status = status;
     }
 
+    // Getters e Setters
     public int getIdServico() {
         return idServico;
     }
@@ -67,5 +76,204 @@ public class ServicoRealizado {
         this.status = status;
     }
 
-    // Implementar os métodos CRUD
+    // Método para adicionar um serviço realizado
+    public static void adicionarServico() {
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        System.out.println("Digite a data do serviço (dd/mm/yyyy): ");
+        String dataStr = scanner.nextLine();
+        Date data = null;
+        try {
+            data = dateFormat.parse(dataStr);
+        } catch (ParseException e) {
+            System.out.println("Erro: Data em formato inválido.");
+            return;
+        }
+
+        System.out.println("Digite o ID da descrição do serviço: ");
+        int idDescricaoServico = scanner.nextInt();
+
+        System.out.println("Digite o ID do cliente: ");
+        int idCliente = scanner.nextInt();
+
+        System.out.println("Digite o ID do pet: ");
+        int idPet = scanner.nextInt();
+        scanner.nextLine();  // Consumir a quebra de linha
+
+        System.out.println("Digite o status do serviço: ");
+        String status = scanner.nextLine();
+
+        ServicoRealizado servico = new ServicoRealizado(data, idDescricaoServico, idCliente, idPet, status);
+
+        String sql = "INSERT INTO ServicoRealizado (data, idDescricaoServico, idCliente, idPet, status) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, new java.sql.Date(servico.getData().getTime()));
+            stmt.setInt(2, servico.getIdDescricaoServico());
+            stmt.setInt(3, servico.getIdCliente());
+            stmt.setInt(4, servico.getIdPet());
+            stmt.setString(5, servico.getStatus());
+            stmt.executeUpdate();
+            System.out.println("Serviço realizado cadastrado com sucesso!");
+        } catch (SQLException e) {
+            System.out.println("Erro ao adicionar serviço: " + e.getMessage());
+        }
+    }
+
+    // Método para listar serviços realizados
+    public static void listarServicos() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        ArrayList<ServicoRealizado> servicos = new ArrayList<>();
+        String sql = "SELECT * FROM ServicoRealizado";
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            System.out.println("Lista de Serviços Realizados:");
+            while (rs.next()) {
+                ServicoRealizado servico = new ServicoRealizado();
+                servico.setIdServico(rs.getInt("idServico"));
+                servico.setData(rs.getDate("data"));
+                servico.setIdDescricaoServico(rs.getInt("idDescricaoServico"));
+                servico.setIdCliente(rs.getInt("idCliente"));
+                servico.setIdPet(rs.getInt("idPet"));
+                servico.setStatus(rs.getString("status"));
+                System.out.println("ID: " + servico.getIdServico() +
+                        ", Data: " + dateFormat.format(servico.getData()) +
+                        ", ID Descrição: " + servico.getIdDescricaoServico() +
+                        ", ID Cliente: " + servico.getIdCliente() +
+                        ", ID Pet: " + servico.getIdPet() +
+                        ", Status: " + servico.getStatus());
+                servicos.add(servico);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar serviços: " + e.getMessage());
+        }
+    }
+
+    // Método para atualizar um serviço realizado
+    public static void atualizarServico() {
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        System.out.println("Digite o ID do serviço a ser atualizado: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();  // Consumir quebra de linha
+
+        ServicoRealizado servico = buscarPorId(id);
+        if (servico != null) {
+            System.out.println("Atualizando informações do serviço: ");
+            System.out.println("Nova data (deixe em branco para manter a atual, formato dd/mm/yyyy): ");
+            String dataStr = scanner.nextLine();
+            if (!dataStr.isEmpty()) {
+                try {
+                    servico.setData(dateFormat.parse(dataStr));
+                } catch (ParseException e) {
+                    System.out.println("Erro: Data em formato inválido.");
+                    return;
+                }
+            }
+            System.out.println("Novo ID de descrição do serviço (deixe em branco para manter o atual): ");
+            String idDescricaoStr = scanner.nextLine();
+            if (!idDescricaoStr.isEmpty()) {
+                servico.setIdDescricaoServico(Integer.parseInt(idDescricaoStr));
+            }
+            System.out.println("Novo ID do cliente (deixe em branco para manter o atual): ");
+            String idClienteStr = scanner.nextLine();
+            if (!idClienteStr.isEmpty()) {
+                servico.setIdCliente(Integer.parseInt(idClienteStr));
+            }
+            System.out.println("Novo ID do pet (deixe em branco para manter o atual): ");
+            String idPetStr = scanner.nextLine();
+            if (!idPetStr.isEmpty()) {
+                servico.setIdPet(Integer.parseInt(idPetStr));
+            }
+            System.out.println("Novo status (deixe em branco para manter o atual): ");
+            String status = scanner.nextLine();
+            if (!status.isEmpty()) {
+                servico.setStatus(status);
+            }
+
+            String sql = "UPDATE ServicoRealizado SET data = ?, idDescricaoServico = ?, idCliente = ?, idPet = ?, status = ? WHERE idServico = ?";
+            try (Connection conn = Conexao.conectar();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setDate(1, new java.sql.Date(servico.getData().getTime()));
+                stmt.setInt(2, servico.getIdDescricaoServico());
+                stmt.setInt(3, servico.getIdCliente());
+                stmt.setInt(4, servico.getIdPet());
+                stmt.setString(5, servico.getStatus());
+                stmt.setInt(6, servico.getIdServico());
+                stmt.executeUpdate();
+                System.out.println("Serviço atualizado com sucesso!");
+            } catch (SQLException e) {
+                System.out.println("Erro ao atualizar serviço: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Serviço com ID " + id + " não encontrado.");
+        }
+    }
+
+    // Método para remover um serviço realizado
+    public static void removerServico() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Digite o ID do serviço a ser removido: ");
+        int id = scanner.nextInt();
+
+        ServicoRealizado servico = buscarPorId(id);
+        if (servico != null) {
+            String sql = "DELETE FROM ServicoRealizado WHERE idServico = ?";
+            try (Connection conn = Conexao.conectar();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, id);
+                stmt.executeUpdate();
+                System.out.println("Serviço removido com sucesso!");
+            } catch (SQLException e) {
+                System.out.println("Erro ao remover serviço: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Serviço com ID " + id + " não encontrado.");
+        }
+    }
+
+    // Método para buscar um serviço por ID
+    public static ServicoRealizado buscarPorId(int idServico) {
+        String sql = "SELECT * FROM ServicoRealizado WHERE idServico = ?";
+        ServicoRealizado servico = null;
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idServico);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    servico = new ServicoRealizado();
+                    servico.setIdServico(rs.getInt("idServico"));
+                    servico.setData(rs.getDate("data"));
+                    servico.setIdDescricaoServico(rs.getInt("idDescricaoServico"));
+                    servico.setIdCliente(rs.getInt("idCliente"));
+                    servico.setIdPet(rs.getInt("idPet"));
+                    servico.setStatus(rs.getString("status"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar serviço: " + e.getMessage());
+        }
+
+        return servico;
+    }
+
+    // Sobrescrevendo o método toString para facilitar a exibição dos dados
+    @Override
+    public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return "ServicoRealizado{" +
+                "idServico=" + idServico +
+                ", data=" + dateFormat.format(data) +
+                ", idDescricaoServico=" + idDescricaoServico +
+                ", idCliente=" + idCliente +
+                ", idPet=" + idPet +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
