@@ -1,7 +1,7 @@
 package main;
 
-import petshop.Raca;
 import java.util.Scanner;
+import petshop.Raca;
 
 public class MenuRaca {
     private static Scanner scanner = new Scanner(System.in);

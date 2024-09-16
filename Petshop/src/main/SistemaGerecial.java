@@ -14,14 +14,10 @@ public class SistemaGerecial {
 
         while (opcao != 0) {
             System.out.println("----- Sistema de Gerenciamento do PetShop -----");
-            System.out.println("1. Gerenciar Clientes");
-            System.out.println("2. Gerenciar Pets");
-            System.out.println("3. Gerenciar Raças");
-            System.out.println("4. Gerenciar Serviços Realizados");
-            System.out.println("0. Sair");
-            System.out.print("Escolha uma opção: ");
+            System.out.println("1. Gerenciar Clientes \n2. Gerenciar Pets \n3. Gerenciar Raças\n4. Gerenciar Serviços Realizados");
+            System.out.println("5. Gerenciar Descrição de Serviços \n0. Sair\nEscolha uma opção:");
             opcao = scanner.nextInt();
-            scanner.nextLine();  // Consumir a quebra de linha
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1:
@@ -35,6 +31,9 @@ public class SistemaGerecial {
                     break;
                 case 4:
                     MenuServicoRealizado.exibirMenu();
+                    break;
+                case 5:
+                    MenuDescricaoServico.exibirMenu();
                     break;
                 case 0:
                     System.out.println("Saindo do sistema...");
