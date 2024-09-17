@@ -17,7 +17,7 @@ public class MenuCliente {
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Consumir quebra de linha
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1:

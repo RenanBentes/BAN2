@@ -27,7 +27,6 @@ public class PetDono {
         this.idCliente = idCliente;
     }
 
-    // Sobrescrevendo o método toString para facilitar a exibição dos dados
     @Override
     public String toString() {
         return "PetDono{" +

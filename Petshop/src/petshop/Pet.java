@@ -66,7 +66,6 @@ public class Pet {
         this.idCliente = idCliente;
     }
 
-    // Método para adicionar um pet
     public static void adicionarPet() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -107,7 +106,6 @@ public class Pet {
         }
     }
 
-    // Método para listar pets
     public static void listarPets() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         ArrayList<Pet> pets = new ArrayList<>();
@@ -136,7 +134,6 @@ public class Pet {
         }
     }
 
-    // Método para atualizar um pet
     public static void atualizarPet() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -192,7 +189,6 @@ public class Pet {
         }
     }
 
-    // Método para remover um pet
     public static void removerPet() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do pet a ser removido: ");
@@ -214,7 +210,6 @@ public class Pet {
         }
     }
 
-    // Método para buscar um pet por ID
     public static Pet buscarPorId(int idPet) {
         String sql = "SELECT * FROM Pet WHERE idPet = ?";
         Pet pet = null;
@@ -239,7 +234,6 @@ public class Pet {
         return pet;
     }
 
-    // Sobrescrevendo o método toString para facilitar a exibição dos dados
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

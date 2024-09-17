@@ -1,68 +1,48 @@
--- Tabela Raça
-CREATE TABLE Raca (
-                      idPetRaca SERIAL PRIMARY KEY,
-                      descricao VARCHAR(100) NOT NULL
-);
--- Tabela Cliente
+-- Criação da tabela Cliente
 CREATE TABLE Cliente (
-                         idCliente SERIAL PRIMARY KEY,
-                         nome VARCHAR(100) NOT NULL,
-                         cpf VARCHAR(14) UNIQUE NOT NULL,
-                         telefone VARCHAR(15),
-                         email VARCHAR(100),
-                         dataCadastro DATE DEFAULT CURRENT_DATE
-);
--- Tabela Pet
-CREATE TABLE Pet (
-                     idPet SERIAL PRIMARY KEY,
-                     nome VARCHAR(100) NOT NULL,
-                     idade INT,
-                     dataNascimento DATE,
-                     idPetRaca INT,
-                     idCliente INT,
-                     dataCadastro DATE DEFAULT CURRENT_DATE,
-                     FOREIGN KEY (idPetRaca) REFERENCES Raca(idPetRaca),
-                     FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    idCliente INT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    cpf CHAR(11) NOT NULL UNIQUE,
+    telefone VARCHAR(15)[], -- Multivalorado: Array de telefones
+    email VARCHAR(50)[]
 );
 
-
-
--- Tabela DescricaoServico
+-- Criação da tabela DescricaoServico
 CREATE TABLE DescricaoServico (
-                                  idDescricaoServico SERIAL PRIMARY KEY,
-                                  ServicoDescricao VARCHAR(255) NOT NULL,
-                                  valor DECIMAL(10, 2) NOT NULL
+    idDescricaoServico INT PRIMARY KEY,
+    servicoDescricao VARCHAR(50) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL
 );
 
--- Tabela ServicoRealizado
-CREATE TABLE ServicoRealizado (
-                                  idServico SERIAL PRIMARY KEY,
-                                  data DATE NOT NULL,
-                                  idDescricaoServico INT,
-                                  idCliente INT,
-                                  idPet INT,
-                                  status VARCHAR(20) DEFAULT 'Agendado',
-                                  FOREIGN KEY (idDescricaoServico) REFERENCES DescricaoServico(idDescricaoServico),
-                                  FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
-                                  FOREIGN KEY (idPet) REFERENCES Pet(idPet)
+-- Criação da tabela Pet
+CREATE TABLE Pet (
+    idPet INT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    dataNascimento DATE
 );
 
--- Tabela PetDono para controlar múltiplos donos de um mesmo Pet
+-- Criação da tabela PetDono (Relacionamento entre Pet e Cliente)
 CREATE TABLE PetDono (
-                         idPet INT,
-                         idCliente INT,
-                         dataInicio DATE DEFAULT CURRENT_DATE,
-                         dataFim DATE,
-                         PRIMARY KEY (idPet, idCliente),
-                         FOREIGN KEY (idPet) REFERENCES Pet(idPet),
-                         FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    idCliente INT,
+    idPet INT,w
+    PRIMARY KEY (idCliente, idPet),
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
+    FOREIGN KEY (idPet) REFERENCES Pet(idPet)
 );
 
--- Tabela intermediária ClienteServico (muitos-para-muitos entre clientes e serviços)
-CREATE TABLE ClienteServico (
-                                idCliente INT,
-                                idServico INT,
-                                PRIMARY KEY (idCliente, idServico),
-                                FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
-                                FOREIGN KEY (idServico) REFERENCES ServicoRealizado(idServico)
+-- Criação da tabela Raca
+CREATE TABLE Raca (
+    idPetRaca INT PRIMARY KEY,
+    descricao VARCHAR(50) NOT NULL
+);
+
+-- Criação da tabela ServicoRealizado
+CREATE TABLE ServicoRealizado (
+    idServico INT PRIMARY KEY,
+    idDescricaoServico INT NOT NULL,
+    idPet INT NOT NULL,
+    data DATE NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (idDescricaoServico) REFERENCES DescricaoServico(idDescricaoServico),
+    FOREIGN KEY (idPet) REFERENCES Pet(idPet)
 );

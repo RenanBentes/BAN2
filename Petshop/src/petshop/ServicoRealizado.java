@@ -76,7 +76,6 @@ public class ServicoRealizado {
         this.status = status;
     }
 
-    // Método para adicionar um serviço realizado
     public static void adicionarServico() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -122,7 +121,6 @@ public class ServicoRealizado {
         }
     }
 
-    // Método para listar serviços realizados
     public static void listarServicos() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         ArrayList<ServicoRealizado> servicos = new ArrayList<>();
@@ -153,14 +151,13 @@ public class ServicoRealizado {
         }
     }
 
-    // Método para atualizar um serviço realizado
     public static void atualizarServico() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         System.out.println("Digite o ID do serviço a ser atualizado: ");
         int id = scanner.nextInt();
-        scanner.nextLine();  // Consumir quebra de linha
+        scanner.nextLine();
 
         ServicoRealizado servico = buscarPorId(id);
         if (servico != null) {
@@ -215,7 +212,6 @@ public class ServicoRealizado {
         }
     }
 
-    // Método para remover um serviço realizado
     public static void removerServico() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do serviço a ser removido: ");
@@ -237,7 +233,6 @@ public class ServicoRealizado {
         }
     }
 
-    // Método para buscar um serviço por ID
     public static ServicoRealizado buscarPorId(int idServico) {
         String sql = "SELECT * FROM ServicoRealizado WHERE idServico = ?";
         ServicoRealizado servico = null;
@@ -263,7 +258,6 @@ public class ServicoRealizado {
         return servico;
     }
 
-    // Sobrescrevendo o método toString para facilitar a exibição dos dados
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

@@ -64,7 +64,6 @@ public class Cliente {
         this.email = email;
     }
 
-    // Método para adicionar um cliente
     public static void adicionarCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o nome do cliente: ");
@@ -92,7 +91,6 @@ public class Cliente {
         }
     }
 
-    // Método para listar clientes
     public static void listarClientes() {
         ArrayList<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM Cliente";
@@ -115,12 +113,11 @@ public class Cliente {
         }
     }
 
-    // Método para atualizar um cliente
     public static void atualizarCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do cliente a ser atualizado: ");
         int id = scanner.nextInt();
-        scanner.nextLine();  // Consumir a quebra de linha
+        scanner.nextLine();
 
         Cliente cliente = buscarPorId(id);
         if (cliente != null) {
@@ -164,7 +161,6 @@ public class Cliente {
         }
     }
 
-    // Método para remover um cliente
     public static void removerCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do cliente a ser removido: ");
@@ -186,7 +182,6 @@ public class Cliente {
         }
     }
 
-    // Método para buscar um cliente por ID
     public static Cliente buscarPorId(int idCliente) {
         String sql = "SELECT * FROM Cliente WHERE idCliente = ?";
         Cliente cliente = null;
@@ -209,7 +204,6 @@ public class Cliente {
         return cliente;
     }
 
-    // Sobrescrevendo o método toString para facilitar a exibição dos dados
     @Override
     public String toString() {
         return "Cliente{" +

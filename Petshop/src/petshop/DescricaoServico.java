@@ -44,7 +44,6 @@ public class DescricaoServico {
         this.valor = valor;
     }
 
-    // Método para adicionar uma descrição de serviço
     public static void adicionarDescricaoServico() {
         Scanner scanner = new Scanner(System.in);
 
@@ -69,7 +68,6 @@ public class DescricaoServico {
         }
     }
 
-    // Método para listar descrições de serviços
     public static void listarDescricoesServico() {
         ArrayList<DescricaoServico> descricoes = new ArrayList<>();
         String sql = "SELECT * FROM DescricaoServico";
@@ -91,12 +89,11 @@ public class DescricaoServico {
         }
     }
 
-    // Método para atualizar uma descrição de serviço
     public static void atualizarDescricaoServico() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da descrição de serviço a ser atualizada: ");
         int id = scanner.nextInt();
-        scanner.nextLine();  // Consumir quebra de linha
+        scanner.nextLine();
 
         DescricaoServico descricaoServico = buscarPorId(id);
         if (descricaoServico != null) {
@@ -128,7 +125,6 @@ public class DescricaoServico {
         }
     }
 
-    // Método para remover uma descrição de serviço
     public static void removerDescricaoServico() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da descrição de serviço a ser removida: ");
@@ -150,7 +146,6 @@ public class DescricaoServico {
         }
     }
 
-    // Método para buscar uma descrição de serviço por ID
     public static DescricaoServico buscarPorId(int idDescricaoServico) {
         String sql = "SELECT * FROM DescricaoServico WHERE idDescricaoServico = ?";
         DescricaoServico descricaoServico = null;
@@ -173,7 +168,6 @@ public class DescricaoServico {
         return descricaoServico;
     }
 
-    // Sobrescrevendo o método toString para facilitar a exibição dos dados
     @Override
     public String toString() {
         return "DescricaoServico{" +

@@ -36,7 +36,6 @@ public class Raca {
         this.descricao = descricao;
     }
 
-    // Método para adicionar uma raça
     public static void adicionarRaca() {
         Scanner scanner = new Scanner(System.in);
 
@@ -56,7 +55,6 @@ public class Raca {
         }
     }
 
-    // Método para listar todas as raças
     public static void listarRacas() {
         ArrayList<Raca> racas = new ArrayList<>();
         String sql = "SELECT * FROM Raca";
@@ -77,7 +75,6 @@ public class Raca {
         }
     }
 
-    // Método para atualizar uma raça
     public static void atualizarRaca() {
         Scanner scanner = new Scanner(System.in);
 
@@ -106,7 +103,6 @@ public class Raca {
         }
     }
 
-    // Método para remover uma raça
     public static void removerRaca() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da raça que deseja remover: ");
@@ -128,7 +124,6 @@ public class Raca {
         }
     }
 
-    // Método para buscar raça por ID
     public static Raca buscarPorId(int idPetRaca) {
         String sql = "SELECT * FROM Raca WHERE idPetRaca = ?";
         Raca raca = null;
