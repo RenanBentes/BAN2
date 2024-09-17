@@ -5,7 +5,7 @@
 -- Dumped from database version 16.4
 -- Dumped by pg_dump version 16.4
 
--- Started on 2024-09-16 22:15:06
+-- Started on 2024-09-16 22:27:51
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -116,18 +116,16 @@ ALTER TABLE public.servicorealizado OWNER TO postgres;
 -- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.cliente (idcliente, nome, cpf, telefone, email) FROM stdin;
-1	Carlos Silva	12345678901	{(47)912345678}	{carlos@email.com}
-2	Ana Souza	23456789012	{(47)923456789}	{ana@email.com}
-3	João Lima	34567890123	{(47)934567890}	{joao@email.com}
-4	Maria Oliveira	45678901234	{(41)945678901}	{maria@email.com}
-5	Fernanda Costa	56789012345	{(41)956789012}	{fernanda@email.com}
-6	José Santos	67890123456	{(47)967890123}	{jose@email.com}
-7	Paula Ferreira	78901234567	{(47)978901234}	{paula@email.com}
-8	Rafael Almeida	89012345678	{(47)989012345}	{rafael@email.com}
-9	Juliana Souza	90123456789	{(41)990123456}	{juliana@email.com}
-10	Roberto Lima	01234567890	{(47)900234567}	{roberto@email.com}
-\.
+INSERT INTO public.cliente VALUES (1, 'Carlos Silva', '12345678901', '{(47)912345678}', '{carlos@email.com}');
+INSERT INTO public.cliente VALUES (2, 'Ana Souza', '23456789012', '{(47)923456789}', '{ana@email.com}');
+INSERT INTO public.cliente VALUES (3, 'João Lima', '34567890123', '{(47)934567890}', '{joao@email.com}');
+INSERT INTO public.cliente VALUES (4, 'Maria Oliveira', '45678901234', '{(41)945678901}', '{maria@email.com}');
+INSERT INTO public.cliente VALUES (5, 'Fernanda Costa', '56789012345', '{(41)956789012}', '{fernanda@email.com}');
+INSERT INTO public.cliente VALUES (6, 'José Santos', '67890123456', '{(47)967890123}', '{jose@email.com}');
+INSERT INTO public.cliente VALUES (7, 'Paula Ferreira', '78901234567', '{(47)978901234}', '{paula@email.com}');
+INSERT INTO public.cliente VALUES (8, 'Rafael Almeida', '89012345678', '{(47)989012345}', '{rafael@email.com}');
+INSERT INTO public.cliente VALUES (9, 'Juliana Souza', '90123456789', '{(41)990123456}', '{juliana@email.com}');
+INSERT INTO public.cliente VALUES (10, 'Roberto Lima', '01234567890', '{(47)900234567}', '{roberto@email.com}');
 
 
 --
@@ -136,15 +134,13 @@ COPY public.cliente (idcliente, nome, cpf, telefone, email) FROM stdin;
 -- Data for Name: descricaoservico; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.descricaoservico (iddescricaoservico, servicodescricao, valor, idpetraca) FROM stdin;
-1	Banho	30.00	1
-2	Banho	40.00	2
-3	Tosa	50.00	1
-4	Banho	50.00	4
-5	Tosa	150.00	3
-6	Banho	100.00	3
-7	Corte de Unhas	40.00	2
-\.
+INSERT INTO public.descricaoservico VALUES (1, 'Banho', 30.00, 1);
+INSERT INTO public.descricaoservico VALUES (2, 'Banho', 40.00, 2);
+INSERT INTO public.descricaoservico VALUES (3, 'Tosa', 50.00, 1);
+INSERT INTO public.descricaoservico VALUES (4, 'Banho', 50.00, 4);
+INSERT INTO public.descricaoservico VALUES (5, 'Tosa', 150.00, 3);
+INSERT INTO public.descricaoservico VALUES (6, 'Banho', 100.00, 3);
+INSERT INTO public.descricaoservico VALUES (7, 'Corte de Unhas', 40.00, 2);
 
 
 --
@@ -153,8 +149,12 @@ COPY public.descricaoservico (iddescricaoservico, servicodescricao, valor, idpet
 -- Data for Name: pet; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.pet (idpet, nome, idpetraca, datanascimento) FROM stdin;
-\.
+INSERT INTO public.pet VALUES (1, 'Rex', 1, '2020-05-15');
+INSERT INTO public.pet VALUES (2, 'Mia', 2, '2019-03-22');
+INSERT INTO public.pet VALUES (3, 'Luna', 3, '2021-07-30');
+INSERT INTO public.pet VALUES (4, 'Max', 4, '2018-12-05');
+INSERT INTO public.pet VALUES (5, 'Bella', 5, '2022-01-10');
+INSERT INTO public.pet VALUES (6, 'Charlie', 3, '2020-08-25');
 
 
 --
@@ -163,8 +163,12 @@ COPY public.pet (idpet, nome, idpetraca, datanascimento) FROM stdin;
 -- Data for Name: petdono; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.petdono (idcliente, idpet) FROM stdin;
-\.
+INSERT INTO public.petdono VALUES (1, 1);
+INSERT INTO public.petdono VALUES (1, 2);
+INSERT INTO public.petdono VALUES (2, 3);
+INSERT INTO public.petdono VALUES (2, 4);
+INSERT INTO public.petdono VALUES (3, 5);
+INSERT INTO public.petdono VALUES (3, 6);
 
 
 --
@@ -173,13 +177,11 @@ COPY public.petdono (idcliente, idpet) FROM stdin;
 -- Data for Name: raca; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.raca (idpetraca, descricao) FROM stdin;
-1	Cão Pequeno
-2	Cão Médio
-3	Cão Grande
-4	Gato Pequeno
-5	Gato Grande
-\.
+INSERT INTO public.raca VALUES (1, 'Cão Pequeno');
+INSERT INTO public.raca VALUES (2, 'Cão Médio');
+INSERT INTO public.raca VALUES (3, 'Cão Grande');
+INSERT INTO public.raca VALUES (4, 'Gato Pequeno');
+INSERT INTO public.raca VALUES (5, 'Gato Grande');
 
 
 --
@@ -188,8 +190,12 @@ COPY public.raca (idpetraca, descricao) FROM stdin;
 -- Data for Name: servicorealizado; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.servicorealizado (idservico, iddescricaoservico, idpet, data, status) FROM stdin;
-\.
+INSERT INTO public.servicorealizado VALUES (1, 1, 1, '2024-09-01', 'Concluído');
+INSERT INTO public.servicorealizado VALUES (2, 2, 2, '2024-09-05', 'Em andamento');
+INSERT INTO public.servicorealizado VALUES (3, 3, 3, '2024-09-10', 'Concluído');
+INSERT INTO public.servicorealizado VALUES (4, 4, 4, '2024-09-15', 'Cancelado');
+INSERT INTO public.servicorealizado VALUES (5, 5, 5, '2024-09-20', 'Concluído');
+INSERT INTO public.servicorealizado VALUES (6, 6, 6, '2024-09-25', 'Em andamento');
 
 
 --
@@ -309,7 +315,7 @@ ALTER TABLE ONLY public.servicorealizado
     ADD CONSTRAINT servicorealizado_idpet_fkey FOREIGN KEY (idpet) REFERENCES public.pet(idpet);
 
 
--- Completed on 2024-09-16 22:15:07
+-- Completed on 2024-09-16 22:27:52
 
 --
 -- PostgreSQL database dump complete

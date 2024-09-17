@@ -13,16 +13,14 @@ public class Pet {
     private String nome;
     private Date dataNascimento;
     private int idPetRaca;
-    private int idCliente;
 
     // Construtores
     public Pet() {}
 
-    public Pet(String nome, Date dataNascimento, int idPetRaca, int idCliente) {
+    public Pet(String nome, Date dataNascimento, int idPetRaca) {
         this.nome = nome;
         this.dataNascimento = dataNascimento;
         this.idPetRaca = idPetRaca;
-        this.idCliente = idCliente;
     }
 
     // Getters e Setters
@@ -58,14 +56,6 @@ public class Pet {
         this.idPetRaca = idPetRaca;
     }
 
-    public int getIdCliente() {
-        return idCliente;
-    }
-
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
-    }
-
     public static void adicionarPet() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -73,7 +63,7 @@ public class Pet {
         System.out.println("Digite o nome do pet: ");
         String nome = scanner.nextLine();
 
-        System.out.println("Digite a data de nascimento do pet (dd/mm/yyyy): ");
+        System.out.println("Digite a data de nascimento do pet (dd/MM/yyyy): ");
         String dataStr = scanner.nextLine();
         Date dataNascimento = null;
         try {
@@ -86,19 +76,15 @@ public class Pet {
         System.out.println("Digite o ID da raça do pet: ");
         int idPetRaca = scanner.nextInt();
 
-        System.out.println("Digite o ID do cliente dono do pet: ");
-        int idCliente = scanner.nextInt();
+        Pet pet = new Pet(nome, dataNascimento, idPetRaca);
 
-        Pet pet = new Pet(nome, dataNascimento, idPetRaca, idCliente);
-
-        String sql = "INSERT INTO Pet (nome, dataNascimento, idPetRaca, idCliente) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Pet (nome, dataNascimento, idPetRaca) VALUES (?, ?, ?)";
 
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, pet.getNome());
             stmt.setDate(2, new java.sql.Date(pet.getDataNascimento().getTime()));
             stmt.setInt(3, pet.getIdPetRaca());
-            stmt.setInt(4, pet.getIdCliente());
             stmt.executeUpdate();
             System.out.println("Pet adicionado com sucesso!");
         } catch (SQLException e) {
@@ -121,12 +107,10 @@ public class Pet {
                 pet.setNome(rs.getString("nome"));
                 pet.setDataNascimento(rs.getDate("dataNascimento"));
                 pet.setIdPetRaca(rs.getInt("idPetRaca"));
-                pet.setIdCliente(rs.getInt("idCliente"));
                 System.out.println("ID: " + pet.getIdPet() +
                         ", Nome: " + pet.getNome() +
                         ", Data de Nascimento: " + dateFormat.format(pet.getDataNascimento()) +
-                        ", ID Raça: " + pet.getIdPetRaca() +
-                        ", ID Cliente: " + pet.getIdCliente());
+                        ", ID Raça: " + pet.getIdPetRaca());
                 pets.add(pet);
             }
         } catch (SQLException e) {
@@ -140,7 +124,7 @@ public class Pet {
 
         System.out.println("Digite o ID do pet a ser atualizado: ");
         int id = scanner.nextInt();
-        scanner.nextLine();  // Consumir quebra de linha
+        scanner.nextLine();
 
         Pet pet = buscarPorId(id);
         if (pet != null) {
@@ -150,7 +134,7 @@ public class Pet {
             if (!nome.isEmpty()) {
                 pet.setNome(nome);
             }
-            System.out.println("Nova data de nascimento (deixe em branco para manter a atual, formato dd/mm/yyyy): ");
+            System.out.println("Nova data de nascimento (deixe em branco para manter a atual, formato dd/MM/yyyy): ");
             String dataStr = scanner.nextLine();
             if (!dataStr.isEmpty()) {
                 try {
@@ -165,20 +149,14 @@ public class Pet {
             if (!idPetRacaStr.isEmpty()) {
                 pet.setIdPetRaca(Integer.parseInt(idPetRacaStr));
             }
-            System.out.println("Novo ID do cliente (deixe em branco para manter o atual): ");
-            String idClienteStr = scanner.nextLine();
-            if (!idClienteStr.isEmpty()) {
-                pet.setIdCliente(Integer.parseInt(idClienteStr));
-            }
 
-            String sql = "UPDATE Pet SET nome = ?, dataNascimento = ?, idPetRaca = ?, idCliente = ? WHERE idPet = ?";
+            String sql = "UPDATE Pet SET nome = ?, dataNascimento = ?, idPetRaca = ? WHERE idPet = ?";
             try (Connection conn = Conexao.conectar();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, pet.getNome());
                 stmt.setDate(2, new java.sql.Date(pet.getDataNascimento().getTime()));
                 stmt.setInt(3, pet.getIdPetRaca());
-                stmt.setInt(4, pet.getIdCliente());
-                stmt.setInt(5, pet.getIdPet());
+                stmt.setInt(4, pet.getIdPet());
                 stmt.executeUpdate();
                 System.out.println("Pet atualizado com sucesso!");
             } catch (SQLException e) {
@@ -224,7 +202,6 @@ public class Pet {
                     pet.setNome(rs.getString("nome"));
                     pet.setDataNascimento(rs.getDate("dataNascimento"));
                     pet.setIdPetRaca(rs.getInt("idPetRaca"));
-                    pet.setIdCliente(rs.getInt("idCliente"));
                 }
             }
         } catch (SQLException e) {
@@ -242,7 +219,6 @@ public class Pet {
                 ", nome='" + nome + '\'' +
                 ", dataNascimento=" + dateFormat.format(dataNascimento) +
                 ", idPetRaca=" + idPetRaca +
-                ", idCliente=" + idCliente +
                 '}';
     }
 }

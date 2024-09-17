@@ -123,28 +123,32 @@ public class ServicoRealizado {
 
     public static void listarServicos() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        ArrayList<ServicoRealizado> servicos = new ArrayList<>();
-        String sql = "SELECT * FROM ServicoRealizado";
+        String sql = "SELECT sr.idServico, ds.servicoDescricao, p.nome AS petNome, sr.data, sr.status, c.idCliente " +
+                "FROM ServicoRealizado sr " +
+                "JOIN DescricaoServico ds ON sr.idDescricaoServico = ds.idDescricaoServico " +
+                "JOIN Pet p ON sr.idPet = p.idPet " +
+                "JOIN PetDono pd ON p.idPet = pd.idPet " +
+                "JOIN Cliente c ON pd.idCliente = c.idCliente";
 
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
+
             System.out.println("Lista de Serviços Realizados:");
             while (rs.next()) {
-                ServicoRealizado servico = new ServicoRealizado();
-                servico.setIdServico(rs.getInt("idServico"));
-                servico.setData(rs.getDate("data"));
-                servico.setIdDescricaoServico(rs.getInt("idDescricaoServico"));
-                servico.setIdCliente(rs.getInt("idCliente"));
-                servico.setIdPet(rs.getInt("idPet"));
-                servico.setStatus(rs.getString("status"));
-                System.out.println("ID: " + servico.getIdServico() +
-                        ", Data: " + dateFormat.format(servico.getData()) +
-                        ", ID Descrição: " + servico.getIdDescricaoServico() +
-                        ", ID Cliente: " + servico.getIdCliente() +
-                        ", ID Pet: " + servico.getIdPet() +
-                        ", Status: " + servico.getStatus());
-                servicos.add(servico);
+                int idServico = rs.getInt("idServico");
+                String servicoDescricao = rs.getString("servicoDescricao");
+                String petNome = rs.getString("petNome");
+                Date data = rs.getDate("data");
+                String status = rs.getString("status");
+                int idCliente = rs.getInt("idCliente");
+
+                System.out.println("ID: " + idServico +
+                        ", Descrição: " + servicoDescricao +
+                        ", Pet Nome: " + petNome +
+                        ", Data: " + dateFormat.format(data) +
+                        ", Status: " + status +
+                        ", ID Cliente: " + idCliente);
             }
         } catch (SQLException e) {
             System.out.println("Erro ao listar serviços: " + e.getMessage());
@@ -261,13 +265,8 @@ public class ServicoRealizado {
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        return "ServicoRealizado{" +
-                "idServico=" + idServico +
-                ", data=" + dateFormat.format(data) +
-                ", idDescricaoServico=" + idDescricaoServico +
-                ", idCliente=" + idCliente +
-                ", idPet=" + idPet +
-                ", status='" + status + '\'' +
-                '}';
+        return "ServicoRealizado{" + "idServico=" + idServico + ", data=" + dateFormat.format(data) +
+                ", idDescricaoServico=" + idDescricaoServico + ", idCliente=" + idCliente +
+                ", idPet=" + idPet + ", status='" + status + '\'' + '}';
     }
 }

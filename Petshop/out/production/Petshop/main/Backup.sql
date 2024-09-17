@@ -5,7 +5,7 @@
 -- Dumped from database version 16.4
 -- Dumped by pg_dump version 16.4
 
--- Started on 2024-09-14 10:45:34
+-- Started on 2024-09-16 22:27:51
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -23,446 +23,183 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 218 (class 1259 OID 16577)
+-- TOC entry 215 (class 1259 OID 16849)
 -- Name: cliente; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.cliente (
     idcliente integer NOT NULL,
-    nome character varying(100) NOT NULL,
-    cpf character varying(14) NOT NULL,
-    telefone character varying(15),
-    email character varying(100),
-    datacadastro date DEFAULT CURRENT_DATE
+    nome character varying(50) NOT NULL,
+    cpf character(11) NOT NULL,
+    telefone character varying(15)[],
+    email character varying(50)[]
 );
 
 
 ALTER TABLE public.cliente OWNER TO postgres;
 
 --
--- TOC entry 217 (class 1259 OID 16576)
--- Name: cliente_idcliente_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.cliente_idcliente_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.cliente_idcliente_seq OWNER TO postgres;
-
---
--- TOC entry 4922 (class 0 OID 0)
--- Dependencies: 217
--- Name: cliente_idcliente_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.cliente_idcliente_seq OWNED BY public.cliente.idcliente;
-
-
---
--- TOC entry 228 (class 1259 OID 16663)
--- Name: clienteservico; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.clienteservico (
-    idcliente integer NOT NULL,
-    idservico integer NOT NULL
-);
-
-
-ALTER TABLE public.clienteservico OWNER TO postgres;
-
---
--- TOC entry 222 (class 1259 OID 16605)
+-- TOC entry 217 (class 1259 OID 16863)
 -- Name: descricaoservico; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.descricaoservico (
     iddescricaoservico integer NOT NULL,
-    servicodescricao character varying(255) NOT NULL,
-    valor numeric(10,2) NOT NULL
+    servicodescricao character varying(50) NOT NULL,
+    valor numeric(10,2) NOT NULL,
+    idpetraca integer
 );
 
 
 ALTER TABLE public.descricaoservico OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 16604)
--- Name: descricaoservico_iddescricaoservico_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.descricaoservico_iddescricaoservico_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.descricaoservico_iddescricaoservico_seq OWNER TO postgres;
-
---
--- TOC entry 4923 (class 0 OID 0)
--- Dependencies: 221
--- Name: descricaoservico_iddescricaoservico_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.descricaoservico_iddescricaoservico_seq OWNED BY public.descricaoservico.iddescricaoservico;
-
-
---
--- TOC entry 226 (class 1259 OID 16635)
--- Name: pagamento; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.pagamento (
-    idpagamento integer NOT NULL,
-    idservico integer,
-    valorpago numeric(10,2),
-    datapagamento date DEFAULT CURRENT_DATE,
-    formapagamento character varying(50)
-);
-
-
-ALTER TABLE public.pagamento OWNER TO postgres;
-
---
--- TOC entry 225 (class 1259 OID 16634)
--- Name: pagamento_idpagamento_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.pagamento_idpagamento_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.pagamento_idpagamento_seq OWNER TO postgres;
-
---
--- TOC entry 4924 (class 0 OID 0)
--- Dependencies: 225
--- Name: pagamento_idpagamento_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.pagamento_idpagamento_seq OWNED BY public.pagamento.idpagamento;
-
-
---
--- TOC entry 220 (class 1259 OID 16587)
+-- TOC entry 218 (class 1259 OID 16873)
 -- Name: pet; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.pet (
     idpet integer NOT NULL,
-    nome character varying(100) NOT NULL,
-    idade integer,
-    datanascimento date,
+    nome character varying(50) NOT NULL,
     idpetraca integer,
-    idcliente integer,
-    datacadastro date DEFAULT CURRENT_DATE
+    datanascimento date
 );
 
 
 ALTER TABLE public.pet OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 16586)
--- Name: pet_idpet_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.pet_idpet_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.pet_idpet_seq OWNER TO postgres;
-
---
--- TOC entry 4925 (class 0 OID 0)
--- Dependencies: 219
--- Name: pet_idpet_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.pet_idpet_seq OWNED BY public.pet.idpet;
-
-
---
--- TOC entry 227 (class 1259 OID 16647)
+-- TOC entry 219 (class 1259 OID 16883)
 -- Name: petdono; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.petdono (
-    idpet integer NOT NULL,
     idcliente integer NOT NULL,
-    datainicio date DEFAULT CURRENT_DATE,
-    datafim date
+    idpet integer NOT NULL
 );
 
 
 ALTER TABLE public.petdono OWNER TO postgres;
 
 --
--- TOC entry 216 (class 1259 OID 16570)
+-- TOC entry 216 (class 1259 OID 16858)
 -- Name: raca; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.raca (
     idpetraca integer NOT NULL,
-    descricao character varying(100) NOT NULL
+    descricao character varying(50) NOT NULL
 );
 
 
 ALTER TABLE public.raca OWNER TO postgres;
 
 --
--- TOC entry 215 (class 1259 OID 16569)
--- Name: raca_idpetraca_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.raca_idpetraca_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.raca_idpetraca_seq OWNER TO postgres;
-
---
--- TOC entry 4926 (class 0 OID 0)
--- Dependencies: 215
--- Name: raca_idpetraca_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.raca_idpetraca_seq OWNED BY public.raca.idpetraca;
-
-
---
--- TOC entry 224 (class 1259 OID 16612)
+-- TOC entry 220 (class 1259 OID 16898)
 -- Name: servicorealizado; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.servicorealizado (
     idservico integer NOT NULL,
+    iddescricaoservico integer NOT NULL,
+    idpet integer NOT NULL,
     data date NOT NULL,
-    iddescricaoservico integer,
-    idcliente integer,
-    idpet integer,
-    status character varying(20) DEFAULT 'Agendado'::character varying
+    status character varying(50) NOT NULL
 );
 
 
 ALTER TABLE public.servicorealizado OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 16611)
--- Name: servicorealizado_idservico_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.servicorealizado_idservico_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.servicorealizado_idservico_seq OWNER TO postgres;
-
---
--- TOC entry 4927 (class 0 OID 0)
--- Dependencies: 223
--- Name: servicorealizado_idservico_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.servicorealizado_idservico_seq OWNED BY public.servicorealizado.idservico;
-
-
---
--- TOC entry 4722 (class 2604 OID 16580)
--- Name: cliente idcliente; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.cliente ALTER COLUMN idcliente SET DEFAULT nextval('public.cliente_idcliente_seq'::regclass);
-
-
---
--- TOC entry 4726 (class 2604 OID 16608)
--- Name: descricaoservico iddescricaoservico; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.descricaoservico ALTER COLUMN iddescricaoservico SET DEFAULT nextval('public.descricaoservico_iddescricaoservico_seq'::regclass);
-
-
---
--- TOC entry 4729 (class 2604 OID 16638)
--- Name: pagamento idpagamento; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.pagamento ALTER COLUMN idpagamento SET DEFAULT nextval('public.pagamento_idpagamento_seq'::regclass);
-
-
---
--- TOC entry 4724 (class 2604 OID 16590)
--- Name: pet idpet; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.pet ALTER COLUMN idpet SET DEFAULT nextval('public.pet_idpet_seq'::regclass);
-
-
---
--- TOC entry 4721 (class 2604 OID 16573)
--- Name: raca idpetraca; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.raca ALTER COLUMN idpetraca SET DEFAULT nextval('public.raca_idpetraca_seq'::regclass);
-
-
---
--- TOC entry 4727 (class 2604 OID 16615)
--- Name: servicorealizado idservico; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.servicorealizado ALTER COLUMN idservico SET DEFAULT nextval('public.servicorealizado_idservico_seq'::regclass);
-
-
---
--- TOC entry 4906 (class 0 OID 16577)
--- Dependencies: 218
+-- TOC entry 4870 (class 0 OID 16849)
+-- Dependencies: 215
 -- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.cliente VALUES (1, 'Carlos Silva', '12345678901', '{(47)912345678}', '{carlos@email.com}');
+INSERT INTO public.cliente VALUES (2, 'Ana Souza', '23456789012', '{(47)923456789}', '{ana@email.com}');
+INSERT INTO public.cliente VALUES (3, 'João Lima', '34567890123', '{(47)934567890}', '{joao@email.com}');
+INSERT INTO public.cliente VALUES (4, 'Maria Oliveira', '45678901234', '{(41)945678901}', '{maria@email.com}');
+INSERT INTO public.cliente VALUES (5, 'Fernanda Costa', '56789012345', '{(41)956789012}', '{fernanda@email.com}');
+INSERT INTO public.cliente VALUES (6, 'José Santos', '67890123456', '{(47)967890123}', '{jose@email.com}');
+INSERT INTO public.cliente VALUES (7, 'Paula Ferreira', '78901234567', '{(47)978901234}', '{paula@email.com}');
+INSERT INTO public.cliente VALUES (8, 'Rafael Almeida', '89012345678', '{(47)989012345}', '{rafael@email.com}');
+INSERT INTO public.cliente VALUES (9, 'Juliana Souza', '90123456789', '{(41)990123456}', '{juliana@email.com}');
+INSERT INTO public.cliente VALUES (10, 'Roberto Lima', '01234567890', '{(47)900234567}', '{roberto@email.com}');
 
 
 --
--- TOC entry 4916 (class 0 OID 16663)
--- Dependencies: 228
--- Data for Name: clienteservico; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- TOC entry 4910 (class 0 OID 16605)
--- Dependencies: 222
+-- TOC entry 4872 (class 0 OID 16863)
+-- Dependencies: 217
 -- Data for Name: descricaoservico; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.descricaoservico VALUES (1, 'Banho', 30.00, 1);
+INSERT INTO public.descricaoservico VALUES (2, 'Banho', 40.00, 2);
+INSERT INTO public.descricaoservico VALUES (3, 'Tosa', 50.00, 1);
+INSERT INTO public.descricaoservico VALUES (4, 'Banho', 50.00, 4);
+INSERT INTO public.descricaoservico VALUES (5, 'Tosa', 150.00, 3);
+INSERT INTO public.descricaoservico VALUES (6, 'Banho', 100.00, 3);
+INSERT INTO public.descricaoservico VALUES (7, 'Corte de Unhas', 40.00, 2);
 
 
 --
--- TOC entry 4914 (class 0 OID 16635)
--- Dependencies: 226
--- Data for Name: pagamento; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- TOC entry 4908 (class 0 OID 16587)
--- Dependencies: 220
+-- TOC entry 4873 (class 0 OID 16873)
+-- Dependencies: 218
 -- Data for Name: pet; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.pet VALUES (1, 'Rex', 1, '2020-05-15');
+INSERT INTO public.pet VALUES (2, 'Mia', 2, '2019-03-22');
+INSERT INTO public.pet VALUES (3, 'Luna', 3, '2021-07-30');
+INSERT INTO public.pet VALUES (4, 'Max', 4, '2018-12-05');
+INSERT INTO public.pet VALUES (5, 'Bella', 5, '2022-01-10');
+INSERT INTO public.pet VALUES (6, 'Charlie', 3, '2020-08-25');
 
 
 --
--- TOC entry 4915 (class 0 OID 16647)
--- Dependencies: 227
+-- TOC entry 4874 (class 0 OID 16883)
+-- Dependencies: 219
 -- Data for Name: petdono; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.petdono VALUES (1, 1);
+INSERT INTO public.petdono VALUES (1, 2);
+INSERT INTO public.petdono VALUES (2, 3);
+INSERT INTO public.petdono VALUES (2, 4);
+INSERT INTO public.petdono VALUES (3, 5);
+INSERT INTO public.petdono VALUES (3, 6);
 
 
 --
--- TOC entry 4904 (class 0 OID 16570)
+-- TOC entry 4871 (class 0 OID 16858)
 -- Dependencies: 216
 -- Data for Name: raca; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.raca VALUES (1, 'Cão Pequeno');
+INSERT INTO public.raca VALUES (2, 'Cão Médio');
+INSERT INTO public.raca VALUES (3, 'Cão Grande');
+INSERT INTO public.raca VALUES (4, 'Gato Pequeno');
+INSERT INTO public.raca VALUES (5, 'Gato Grande');
 
 
 --
--- TOC entry 4912 (class 0 OID 16612)
--- Dependencies: 224
+-- TOC entry 4875 (class 0 OID 16898)
+-- Dependencies: 220
 -- Data for Name: servicorealizado; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.servicorealizado VALUES (1, 1, 1, '2024-09-01', 'Concluído');
+INSERT INTO public.servicorealizado VALUES (2, 2, 2, '2024-09-05', 'Em andamento');
+INSERT INTO public.servicorealizado VALUES (3, 3, 3, '2024-09-10', 'Concluído');
+INSERT INTO public.servicorealizado VALUES (4, 4, 4, '2024-09-15', 'Cancelado');
+INSERT INTO public.servicorealizado VALUES (5, 5, 5, '2024-09-20', 'Concluído');
+INSERT INTO public.servicorealizado VALUES (6, 6, 6, '2024-09-25', 'Em andamento');
 
 
 --
--- TOC entry 4928 (class 0 OID 0)
--- Dependencies: 217
--- Name: cliente_idcliente_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.cliente_idcliente_seq', 1, false);
-
-
---
--- TOC entry 4929 (class 0 OID 0)
--- Dependencies: 221
--- Name: descricaoservico_iddescricaoservico_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.descricaoservico_iddescricaoservico_seq', 1, false);
-
-
---
--- TOC entry 4930 (class 0 OID 0)
--- Dependencies: 225
--- Name: pagamento_idpagamento_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.pagamento_idpagamento_seq', 1, false);
-
-
---
--- TOC entry 4931 (class 0 OID 0)
--- Dependencies: 219
--- Name: pet_idpet_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.pet_idpet_seq', 1, false);
-
-
---
--- TOC entry 4932 (class 0 OID 0)
--- Dependencies: 215
--- Name: raca_idpetraca_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.raca_idpetraca_seq', 1, false);
-
-
---
--- TOC entry 4933 (class 0 OID 0)
--- Dependencies: 223
--- Name: servicorealizado_idservico_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.servicorealizado_idservico_seq', 1, false);
-
-
---
--- TOC entry 4735 (class 2606 OID 16585)
+-- TOC entry 4708 (class 2606 OID 16857)
 -- Name: cliente cliente_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -471,7 +208,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- TOC entry 4737 (class 2606 OID 16583)
+-- TOC entry 4710 (class 2606 OID 16855)
 -- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -480,16 +217,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- TOC entry 4749 (class 2606 OID 16667)
--- Name: clienteservico clienteservico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.clienteservico
-    ADD CONSTRAINT clienteservico_pkey PRIMARY KEY (idcliente, idservico);
-
-
---
--- TOC entry 4741 (class 2606 OID 16610)
+-- TOC entry 4714 (class 2606 OID 16867)
 -- Name: descricaoservico descricaoservico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -498,16 +226,7 @@ ALTER TABLE ONLY public.descricaoservico
 
 
 --
--- TOC entry 4745 (class 2606 OID 16641)
--- Name: pagamento pagamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.pagamento
-    ADD CONSTRAINT pagamento_pkey PRIMARY KEY (idpagamento);
-
-
---
--- TOC entry 4739 (class 2606 OID 16593)
+-- TOC entry 4716 (class 2606 OID 16877)
 -- Name: pet pet_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -516,16 +235,16 @@ ALTER TABLE ONLY public.pet
 
 
 --
--- TOC entry 4747 (class 2606 OID 16652)
+-- TOC entry 4718 (class 2606 OID 16887)
 -- Name: petdono petdono_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.petdono
-    ADD CONSTRAINT petdono_pkey PRIMARY KEY (idpet, idcliente);
+    ADD CONSTRAINT petdono_pkey PRIMARY KEY (idcliente, idpet);
 
 
 --
--- TOC entry 4733 (class 2606 OID 16575)
+-- TOC entry 4712 (class 2606 OID 16862)
 -- Name: raca raca_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -534,7 +253,7 @@ ALTER TABLE ONLY public.raca
 
 
 --
--- TOC entry 4743 (class 2606 OID 16618)
+-- TOC entry 4720 (class 2606 OID 16902)
 -- Name: servicorealizado servicorealizado_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -543,43 +262,16 @@ ALTER TABLE ONLY public.servicorealizado
 
 
 --
--- TOC entry 4758 (class 2606 OID 16668)
--- Name: clienteservico clienteservico_idcliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 4721 (class 2606 OID 16868)
+-- Name: descricaoservico descricaoservico_idpetraca_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.clienteservico
-    ADD CONSTRAINT clienteservico_idcliente_fkey FOREIGN KEY (idcliente) REFERENCES public.cliente(idcliente);
-
-
---
--- TOC entry 4759 (class 2606 OID 16673)
--- Name: clienteservico clienteservico_idservico_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.clienteservico
-    ADD CONSTRAINT clienteservico_idservico_fkey FOREIGN KEY (idservico) REFERENCES public.servicorealizado(idservico);
+ALTER TABLE ONLY public.descricaoservico
+    ADD CONSTRAINT descricaoservico_idpetraca_fkey FOREIGN KEY (idpetraca) REFERENCES public.raca(idpetraca);
 
 
 --
--- TOC entry 4755 (class 2606 OID 16642)
--- Name: pagamento pagamento_idservico_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.pagamento
-    ADD CONSTRAINT pagamento_idservico_fkey FOREIGN KEY (idservico) REFERENCES public.servicorealizado(idservico);
-
-
---
--- TOC entry 4750 (class 2606 OID 16599)
--- Name: pet pet_idcliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.pet
-    ADD CONSTRAINT pet_idcliente_fkey FOREIGN KEY (idcliente) REFERENCES public.cliente(idcliente);
-
-
---
--- TOC entry 4751 (class 2606 OID 16594)
+-- TOC entry 4722 (class 2606 OID 16878)
 -- Name: pet pet_idpetraca_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -588,7 +280,7 @@ ALTER TABLE ONLY public.pet
 
 
 --
--- TOC entry 4756 (class 2606 OID 16658)
+-- TOC entry 4723 (class 2606 OID 16888)
 -- Name: petdono petdono_idcliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -597,7 +289,7 @@ ALTER TABLE ONLY public.petdono
 
 
 --
--- TOC entry 4757 (class 2606 OID 16653)
+-- TOC entry 4724 (class 2606 OID 16893)
 -- Name: petdono petdono_idpet_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -606,16 +298,7 @@ ALTER TABLE ONLY public.petdono
 
 
 --
--- TOC entry 4752 (class 2606 OID 16624)
--- Name: servicorealizado servicorealizado_idcliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.servicorealizado
-    ADD CONSTRAINT servicorealizado_idcliente_fkey FOREIGN KEY (idcliente) REFERENCES public.cliente(idcliente);
-
-
---
--- TOC entry 4753 (class 2606 OID 16619)
+-- TOC entry 4725 (class 2606 OID 16903)
 -- Name: servicorealizado servicorealizado_iddescricaoservico_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -624,7 +307,7 @@ ALTER TABLE ONLY public.servicorealizado
 
 
 --
--- TOC entry 4754 (class 2606 OID 16629)
+-- TOC entry 4726 (class 2606 OID 16908)
 -- Name: servicorealizado servicorealizado_idpet_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -632,7 +315,7 @@ ALTER TABLE ONLY public.servicorealizado
     ADD CONSTRAINT servicorealizado_idpet_fkey FOREIGN KEY (idpet) REFERENCES public.pet(idpet);
 
 
--- Completed on 2024-09-14 10:45:34
+-- Completed on 2024-09-16 22:27:52
 
 --
 -- PostgreSQL database dump complete

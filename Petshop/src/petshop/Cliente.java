@@ -64,6 +64,22 @@ public class Cliente {
         this.email = email;
     }
 
+    public static boolean existeCliente(String cpf) {
+        String sql = "SELECT COUNT(*) FROM Cliente WHERE cpf = ?";
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, cpf);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao verificar existência de cliente: " + e.getMessage());
+        }
+        return false;
+    }
+
     public static void adicionarCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o nome do cliente: ");
@@ -74,6 +90,11 @@ public class Cliente {
         String telefone = scanner.nextLine();
         System.out.println("Digite o email do cliente: ");
         String email = scanner.nextLine();
+
+        if (existeCliente(cpf)) {
+            System.out.println("Erro: Cliente com CPF " + cpf + " já existe.");
+            return;
+        }
 
         Cliente cliente = new Cliente(nome, cpf, telefone, email);
 
@@ -130,6 +151,10 @@ public class Cliente {
             System.out.println("Novo CPF (deixe em branco para manter o atual): ");
             String cpf = scanner.nextLine();
             if (!cpf.isEmpty()) {
+                if (existeCliente(cpf)) {
+                    System.out.println("Erro: Cliente com CPF " + cpf + " já existe.");
+                    return;
+                }
                 cliente.setCpf(cpf);
             }
             System.out.println("Novo telefone (deixe em branco para manter o atual): ");
