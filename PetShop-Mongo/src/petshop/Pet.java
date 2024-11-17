@@ -1,6 +1,8 @@
 package petshop;
 
-import java.sql.*;
+import com.mongodb.client.*;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +11,7 @@ import java.util.Scanner;
 import main.Conexao;
 
 public class Pet {
-    private int idPet;
+    private String idPet; // Alterado para String, pois MongoDB usa ObjectId
     private String nome;
     private Date dataNascimento;
     private int idPetRaca;
@@ -24,11 +26,11 @@ public class Pet {
     }
 
     // Getters e Setters
-    public int getIdPet() {
+    public String getIdPet() {
         return idPet;
     }
 
-    public void setIdPet(int idPet) {
+    public void setIdPet(String idPet) {
         this.idPet = idPet;
     }
 
@@ -56,6 +58,7 @@ public class Pet {
         this.idPetRaca = idPetRaca;
     }
 
+    // Adiciona um novo pet ao banco de dados
     public static void adicionarPet() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -78,43 +81,39 @@ public class Pet {
 
         Pet pet = new Pet(nome, dataNascimento, idPetRaca);
 
-        String sql = "INSERT INTO Pet (nome, dataNascimento, idPetRaca) VALUES (?, ?, ?)";
+        Document petDoc = new Document("nome", pet.getNome())
+                .append("dataNascimento", pet.getDataNascimento())
+                .append("idPetRaca", pet.getIdPetRaca());
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, pet.getNome());
-            stmt.setDate(2, new java.sql.Date(pet.getDataNascimento().getTime()));
-            stmt.setInt(3, pet.getIdPetRaca());
-            stmt.executeUpdate();
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+            petsCollection.insertOne(petDoc);
             System.out.println("Pet adicionado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao adicionar pet: " + e.getMessage());
         }
     }
 
     public static void listarPets() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         ArrayList<Pet> pets = new ArrayList<>();
-        String sql = "SELECT * FROM Pet";
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+            MongoCursor<Document> cursor = petsCollection.find().iterator();
+
             System.out.println("Lista de Pets:");
-            while (rs.next()) {
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
                 Pet pet = new Pet();
-                pet.setIdPet(rs.getInt("idPet"));
-                pet.setNome(rs.getString("nome"));
-                pet.setDataNascimento(rs.getDate("dataNascimento"));
-                pet.setIdPetRaca(rs.getInt("idPetRaca"));
+                pet.setIdPet(doc.getObjectId("_id").toHexString());
+                pet.setNome(doc.getString("nome"));
+                pet.setDataNascimento(doc.getDate("dataNascimento"));
+                pet.setIdPetRaca(doc.getInteger("idPetRaca"));
                 System.out.println("ID: " + pet.getIdPet() +
                         ", Nome: " + pet.getNome() +
                         ", Data de Nascimento: " + dateFormat.format(pet.getDataNascimento()) +
                         ", ID Raça: " + pet.getIdPetRaca());
                 pets.add(pet);
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar pets: " + e.getMessage());
         }
     }
 
@@ -123,8 +122,7 @@ public class Pet {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         System.out.println("Digite o ID do pet a ser atualizado: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+        String id = scanner.nextLine();
 
         Pet pet = buscarPorId(id);
         if (pet != null) {
@@ -150,17 +148,14 @@ public class Pet {
                 pet.setIdPetRaca(Integer.parseInt(idPetRacaStr));
             }
 
-            String sql = "UPDATE Pet SET nome = ?, dataNascimento = ?, idPetRaca = ? WHERE idPet = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, pet.getNome());
-                stmt.setDate(2, new java.sql.Date(pet.getDataNascimento().getTime()));
-                stmt.setInt(3, pet.getIdPetRaca());
-                stmt.setInt(4, pet.getIdPet());
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+                Document query = new Document("_id", new ObjectId(id));
+                Document update = new Document("$set", new Document("nome", pet.getNome())
+                        .append("dataNascimento", pet.getDataNascimento())
+                        .append("idPetRaca", pet.getIdPetRaca()));
+                petsCollection.updateOne(query, update);
                 System.out.println("Pet atualizado com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao atualizar pet: " + e.getMessage());
             }
         } else {
             System.out.println("Pet com ID " + id + " não encontrado.");
@@ -170,52 +165,44 @@ public class Pet {
     public static void removerPet() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do pet a ser removido: ");
-        int id = scanner.nextInt();
+        String id = scanner.nextLine();
 
         Pet pet = buscarPorId(id);
         if (pet != null) {
-            String sql = "DELETE FROM Pet WHERE idPet = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+                Document query = new Document("_id", new ObjectId(id));
+                petsCollection.deleteOne(query);
                 System.out.println("Pet removido com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao remover pet: " + e.getMessage());
             }
         } else {
             System.out.println("Pet com ID " + id + " não encontrado.");
         }
     }
 
-    public static Pet buscarPorId(int idPet) {
-        String sql = "SELECT * FROM Pet WHERE idPet = ?";
-        Pet pet = null;
+    public static Pet buscarPorId(String idPet) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+            Document query = new Document("_id", new ObjectId(idPet));
+            Document doc = petsCollection.find(query).first();
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idPet);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    pet = new Pet();
-                    pet.setIdPet(rs.getInt("idPet"));
-                    pet.setNome(rs.getString("nome"));
-                    pet.setDataNascimento(rs.getDate("dataNascimento"));
-                    pet.setIdPetRaca(rs.getInt("idPetRaca"));
-                }
+            if (doc != null) {
+                Pet pet = new Pet();
+                pet.setIdPet(doc.getObjectId("_id").toHexString());
+                pet.setNome(doc.getString("nome"));
+                pet.setDataNascimento(doc.getDate("dataNascimento"));
+                pet.setIdPetRaca(doc.getInteger("idPetRaca"));
+                return pet;
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao buscar pet: " + e.getMessage());
         }
-
-        return pet;
+        return null;
     }
 
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return "Pet{" +
-                "idPet=" + idPet +
+                "idPet='" + idPet + '\'' +
                 ", nome='" + nome + '\'' +
                 ", dataNascimento=" + dateFormat.format(dataNascimento) +
                 ", idPetRaca=" + idPetRaca +

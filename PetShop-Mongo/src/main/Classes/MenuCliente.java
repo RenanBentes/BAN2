@@ -1,4 +1,4 @@
-package main;
+package main.Classes;
 
 import petshop.Cliente;
 import java.util.Scanner;

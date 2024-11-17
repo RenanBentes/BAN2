@@ -1,11 +1,13 @@
 package petshop;
 
-import java.sql.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+
 import main.Conexao;
 
 public class ServicoRealizado {
@@ -104,54 +106,42 @@ public class ServicoRealizado {
         String status = scanner.nextLine();
 
         ServicoRealizado servico = new ServicoRealizado(data, idDescricaoServico, idCliente, idPet, status);
+        MongoDatabase database = Conexao.getDatabase();
+        MongoCollection<Document> collection = database.getCollection("ServicoRealizado");
 
-        String sql = "INSERT INTO ServicoRealizado (data, idDescricaoServico, idCliente, idPet, status) VALUES (?, ?, ?, ?, ?)";
+        Document document = new Document("data", servico.getData())
+                .append("idDescricaoServico", servico.getIdDescricaoServico())
+                .append("idCliente", servico.getIdCliente())
+                .append("idPet", servico.getIdPet())
+                .append("status", servico.getStatus());
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, new java.sql.Date(servico.getData().getTime()));
-            stmt.setInt(2, servico.getIdDescricaoServico());
-            stmt.setInt(3, servico.getIdCliente());
-            stmt.setInt(4, servico.getIdPet());
-            stmt.setString(5, servico.getStatus());
-            stmt.executeUpdate();
+        try {
+            collection.insertOne(document);
             System.out.println("Serviço realizado cadastrado com sucesso!");
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.out.println("Erro ao adicionar serviço: " + e.getMessage());
         }
     }
 
     public static void listarServicos() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        String sql = "SELECT sr.idServico, ds.servicoDescricao, p.nome AS petNome, sr.data, sr.status, c.idCliente " +
-                "FROM ServicoRealizado sr " +
-                "JOIN DescricaoServico ds ON sr.idDescricaoServico = ds.idDescricaoServico " +
-                "JOIN Pet p ON sr.idPet = p.idPet " +
-                "JOIN PetDono pd ON p.idPet = pd.idPet " +
-                "JOIN Cliente c ON pd.idCliente = c.idCliente";
+        MongoDatabase database = Conexao.getDatabase();
+        MongoCollection<Document> collection = database.getCollection("ServicoRealizado");
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        for (Document doc : collection.find()) {
+            int idServico = doc.getInteger("_id");
+            Date data = doc.getDate("data");
+            String status = doc.getString("status");
+            int idCliente = doc.getInteger("idCliente");
+            int idDescricaoServico = doc.getInteger("idDescricaoServico");
+            int idPet = doc.getInteger("idPet");
 
-            System.out.println("Lista de Serviços Realizados:");
-            while (rs.next()) {
-                int idServico = rs.getInt("idServico");
-                String servicoDescricao = rs.getString("servicoDescricao");
-                String petNome = rs.getString("petNome");
-                Date data = rs.getDate("data");
-                String status = rs.getString("status");
-                int idCliente = rs.getInt("idCliente");
-
-                System.out.println("ID: " + idServico +
-                        ", Descrição: " + servicoDescricao +
-                        ", Pet Nome: " + petNome +
-                        ", Data: " + dateFormat.format(data) +
-                        ", Status: " + status +
-                        ", ID Cliente: " + idCliente);
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar serviços: " + e.getMessage());
+            System.out.println("ID: " + idServico +
+                    ", Descrição: " + idDescricaoServico +
+                    ", Pet ID: " + idPet +
+                    ", Data: " + dateFormat.format(data) +
+                    ", Status: " + status +
+                    ", Cliente ID: " + idCliente);
         }
     }
 
@@ -197,18 +187,19 @@ public class ServicoRealizado {
                 servico.setStatus(status);
             }
 
-            String sql = "UPDATE ServicoRealizado SET data = ?, idDescricaoServico = ?, idCliente = ?, idPet = ?, status = ? WHERE idServico = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setDate(1, new java.sql.Date(servico.getData().getTime()));
-                stmt.setInt(2, servico.getIdDescricaoServico());
-                stmt.setInt(3, servico.getIdCliente());
-                stmt.setInt(4, servico.getIdPet());
-                stmt.setString(5, servico.getStatus());
-                stmt.setInt(6, servico.getIdServico());
-                stmt.executeUpdate();
+            MongoDatabase database = Conexao.getDatabase();
+            MongoCollection<Document> collection = database.getCollection("ServicoRealizado");
+
+            Document updatedDocument = new Document("data", servico.getData())
+                    .append("idDescricaoServico", servico.getIdDescricaoServico())
+                    .append("idCliente", servico.getIdCliente())
+                    .append("idPet", servico.getIdPet())
+                    .append("status", servico.getStatus());
+
+            try {
+                collection.updateOne(new Document("_id", id), new Document("$set", updatedDocument));
                 System.out.println("Serviço atualizado com sucesso!");
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 System.out.println("Erro ao atualizar serviço: " + e.getMessage());
             }
         } else {
@@ -223,13 +214,13 @@ public class ServicoRealizado {
 
         ServicoRealizado servico = buscarPorId(id);
         if (servico != null) {
-            String sql = "DELETE FROM ServicoRealizado WHERE idServico = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
+            MongoDatabase database = Conexao.getDatabase();
+            MongoCollection<Document> collection = database.getCollection("ServicoRealizado");
+
+            try {
+                collection.deleteOne(new Document("_id", id));
                 System.out.println("Serviço removido com sucesso!");
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 System.out.println("Erro ao remover serviço: " + e.getMessage());
             }
         } else {
@@ -238,35 +229,31 @@ public class ServicoRealizado {
     }
 
     public static ServicoRealizado buscarPorId(int idServico) {
-        String sql = "SELECT * FROM ServicoRealizado WHERE idServico = ?";
-        ServicoRealizado servico = null;
+        MongoDatabase database = Conexao.getDatabase();
+        MongoCollection<Document> collection = database.getCollection("ServicoRealizado");
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idServico);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    servico = new ServicoRealizado();
-                    servico.setIdServico(rs.getInt("idServico"));
-                    servico.setData(rs.getDate("data"));
-                    servico.setIdDescricaoServico(rs.getInt("idDescricaoServico"));
-                    servico.setIdCliente(rs.getInt("idCliente"));
-                    servico.setIdPet(rs.getInt("idPet"));
-                    servico.setStatus(rs.getString("status"));
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao buscar serviço: " + e.getMessage());
+        Document doc = collection.find(new Document("_id", idServico)).first();
+        if (doc != null) {
+            ServicoRealizado servico = new ServicoRealizado();
+            servico.setIdServico(doc.getInteger("_id"));
+            servico.setData(doc.getDate("data"));
+            servico.setIdDescricaoServico(doc.getInteger("idDescricaoServico"));
+            servico.setIdCliente(doc.getInteger("idCliente"));
+            servico.setIdPet(doc.getInteger("idPet"));
+            servico.setStatus(doc.getString("status"));
+            return servico;
         }
-
-        return servico;
+        return null;
     }
 
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        return "ServicoRealizado{" + "idServico=" + idServico + ", data=" + dateFormat.format(data) +
-                ", idDescricaoServico=" + idDescricaoServico + ", idCliente=" + idCliente +
-                ", idPet=" + idPet + ", status='" + status + '\'' + '}';
+        return "ID Serviço: " + idServico + "\n" +
+                "Data: " + dateFormat.format(data) + "\n" +
+                "Descrição do Serviço: " + idDescricaoServico + "\n" +
+                "Cliente ID: " + idCliente + "\n" +
+                "Pet ID: " + idPet + "\n" +
+                "Status: " + status;
     }
 }

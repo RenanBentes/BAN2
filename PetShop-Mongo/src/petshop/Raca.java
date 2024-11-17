@@ -1,15 +1,14 @@
 package petshop;
 
+import com.mongodb.client.*;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import main.Conexao;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Raca {
-    private int idPetRaca;
+    private String idPetRaca; // Alterado para String, pois MongoDB usa ObjectId
     private String descricao;
 
     // Construtores
@@ -20,11 +19,11 @@ public class Raca {
     }
 
     // Getters e Setters
-    public int getIdPetRaca() {
+    public String getIdPetRaca() {
         return idPetRaca;
     }
 
-    public void setIdPetRaca(int idPetRaca) {
+    public void setIdPetRaca(String idPetRaca) {
         this.idPetRaca = idPetRaca;
     }
 
@@ -36,6 +35,7 @@ public class Raca {
         this.descricao = descricao;
     }
 
+    // Adiciona uma nova raça
     public static void adicionarRaca() {
         Scanner scanner = new Scanner(System.in);
 
@@ -43,44 +43,42 @@ public class Raca {
         String descricao = scanner.nextLine();
 
         Raca raca = new Raca(descricao);
-        String sql = "INSERT INTO Raca (descricao) VALUES (?)";
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, raca.getDescricao());
-            stmt.executeUpdate();
+        Document racaDoc = new Document("descricao", raca.getDescricao());
+
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+            racasCollection.insertOne(racaDoc);
             System.out.println("Raça cadastrada com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao cadastrar raça: " + e.getMessage());
         }
     }
 
+    // Lista todas as raças
     public static void listarRacas() {
         ArrayList<Raca> racas = new ArrayList<>();
-        String sql = "SELECT * FROM Raca";
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+            MongoCursor<Document> cursor = racasCollection.find().iterator();
+
             System.out.println("Lista de Raças:");
-            while (rs.next()) {
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
                 Raca raca = new Raca();
-                raca.setIdPetRaca(rs.getInt("idPetRaca"));
-                raca.setDescricao(rs.getString("descricao"));
+                raca.setIdPetRaca(doc.getObjectId("_id").toHexString());
+                raca.setDescricao(doc.getString("descricao"));
                 System.out.println("ID: " + raca.getIdPetRaca() + ", Descrição: " + raca.getDescricao());
                 racas.add(raca);
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar raças: " + e.getMessage());
         }
     }
 
+    // Atualiza informações de uma raça
     public static void atualizarRaca() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Digite o ID da raça que deseja atualizar: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();  // Consumir quebra de linha
+        String id = scanner.nextLine();
 
         Raca raca = buscarPorId(id);
         if (raca != null) {
@@ -88,60 +86,59 @@ public class Raca {
             String novaDescricao = scanner.nextLine();
             raca.setDescricao(novaDescricao);
 
-            String sql = "UPDATE Raca SET descricao = ? WHERE idPetRaca = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, raca.getDescricao());
-                stmt.setInt(2, raca.getIdPetRaca());
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+                Document query = new Document("_id", new ObjectId(id));
+                Document update = new Document("$set", new Document("descricao", raca.getDescricao()));
+                racasCollection.updateOne(query, update);
                 System.out.println("Raça atualizada com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao atualizar raça: " + e.getMessage());
             }
         } else {
             System.out.println("Raça com ID " + id + " não encontrada.");
         }
     }
 
+    // Remove uma raça pelo ID
     public static void removerRaca() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da raça que deseja remover: ");
-        int id = scanner.nextInt();
+        String id = scanner.nextLine();
 
         Raca raca = buscarPorId(id);
         if (raca != null) {
-            String sql = "DELETE FROM Raca WHERE idPetRaca = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+                Document query = new Document("_id", new ObjectId(id));
+                racasCollection.deleteOne(query);
                 System.out.println("Raça removida com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao remover raça: " + e.getMessage());
             }
         } else {
             System.out.println("Raça com ID " + id + " não encontrada.");
         }
     }
 
-    public static Raca buscarPorId(int idPetRaca) {
-        String sql = "SELECT * FROM Raca WHERE idPetRaca = ?";
-        Raca raca = null;
+    // Busca uma raça pelo ID
+    public static Raca buscarPorId(String idPetRaca) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+            Document query = new Document("_id", new ObjectId(idPetRaca));
+            Document doc = racasCollection.find(query).first();
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idPetRaca);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    raca = new Raca();
-                    raca.setIdPetRaca(rs.getInt("idPetRaca"));
-                    raca.setDescricao(rs.getString("descricao"));
-                }
+            if (doc != null) {
+                Raca raca = new Raca();
+                raca.setIdPetRaca(doc.getObjectId("_id").toHexString());
+                raca.setDescricao(doc.getString("descricao"));
+                return raca;
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao buscar raça: " + e.getMessage());
         }
+        return null;
+    }
 
-        return raca;
+    @Override
+    public String toString() {
+        return "Raca{" +
+                "idPetRaca='" + idPetRaca + '\'' +
+                ", descricao='" + descricao + '\'' +
+                '}';
     }
 }

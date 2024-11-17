@@ -1,20 +1,19 @@
 package petshop;
 
-import java.sql.*;
-import java.util.ArrayList;
+import com.mongodb.client.*;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import java.util.Scanner;
 import main.Conexao;
 
 public class Cliente {
-    private int idCliente;
+    private String idCliente;
     private String nome;
     private String cpf;
     private String telefone;
     private String email;
 
-    // Construtores
-    public Cliente() {
-    }
+    public Cliente() {}
 
     public Cliente(String nome, String cpf, String telefone, String email) {
         this.nome = nome;
@@ -24,11 +23,11 @@ public class Cliente {
     }
 
     // Getters e Setters
-    public int getIdCliente() {
+    public String getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(int idCliente) {
+    public void setIdCliente(String idCliente) {
         this.idCliente = idCliente;
     }
 
@@ -65,19 +64,12 @@ public class Cliente {
     }
 
     public static boolean existeCliente(String cpf) {
-        String sql = "SELECT COUNT(*) FROM Cliente WHERE cpf = ?";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, cpf);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao verificar existência de cliente: " + e.getMessage());
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            Document query = new Document("cpf", cpf);
+            long count = clientes.countDocuments(query);
+            return count > 0;
         }
-        return false;
     }
 
     public static void adicionarCliente() {
@@ -96,49 +88,31 @@ public class Cliente {
             return;
         }
 
-        Cliente cliente = new Cliente(nome, cpf, telefone, email);
+        Document cliente = new Document("nome", nome)
+                .append("cpf", cpf)
+                .append("telefone", telefone)
+                .append("email", email);
 
-        String sql = "INSERT INTO Cliente (nome, cpf, telefone, email) VALUES (?, ?, ?, ?)";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, cliente.getNome());
-            stmt.setString(2, cliente.getCpf());
-            stmt.setString(3, cliente.getTelefone());
-            stmt.setString(4, cliente.getEmail());
-            stmt.executeUpdate();
-            System.out.println("Cliente adicionado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao adicionar cliente: " + e.getMessage());
-        }
+
     }
 
     public static void listarClientes() {
-        ArrayList<Cliente> clientes = new ArrayList<>();
-        String sql = "SELECT * FROM Cliente";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            MongoCursor<Document> cursor = clientes.find().iterator();
+
             System.out.println("Lista de Clientes:");
-            while (rs.next()) {
-                Cliente cliente = new Cliente();
-                cliente.setIdCliente(rs.getInt("idCliente"));
-                cliente.setNome(rs.getString("nome"));
-                cliente.setCpf(rs.getString("cpf"));
-                cliente.setTelefone(rs.getString("telefone"));
-                cliente.setEmail(rs.getString("email"));
-                System.out.println(cliente);
-                clientes.add(cliente);
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
+                System.out.println(doc.toJson());
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar clientes: " + e.getMessage());
         }
     }
 
     public static void atualizarCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do cliente a ser atualizado: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+        String id = scanner.nextLine();
 
         Cliente cliente = buscarPorId(id);
         if (cliente != null) {
@@ -168,18 +142,15 @@ public class Cliente {
                 cliente.setEmail(email);
             }
 
-            String sql = "UPDATE Cliente SET nome = ?, cpf = ?, telefone = ?, email = ? WHERE idCliente = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, cliente.getNome());
-                stmt.setString(2, cliente.getCpf());
-                stmt.setString(3, cliente.getTelefone());
-                stmt.setString(4, cliente.getEmail());
-                stmt.setInt(5, cliente.getIdCliente());
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+                Document query = new Document("_id", new ObjectId(id));
+                Document update = new Document("$set", new Document("nome", cliente.getNome())
+                        .append("cpf", cliente.getCpf())
+                        .append("telefone", cliente.getTelefone())
+                        .append("email", cliente.getEmail()));
+                clientes.updateOne(query, update);
                 System.out.println("Cliente atualizado com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao atualizar cliente: " + e.getMessage());
             }
         } else {
             System.out.println("Cliente com ID " + id + " não encontrado.");
@@ -189,50 +160,39 @@ public class Cliente {
     public static void removerCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do cliente a ser removido: ");
-        int id = scanner.nextInt();
+        String id = scanner.nextLine();
 
-        Cliente cliente = buscarPorId(id);
-        if (cliente != null) {
-            String sql = "DELETE FROM Cliente WHERE idCliente = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
-                System.out.println("Cliente removido com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao remover cliente: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Cliente com ID " + id + " não encontrado.");
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            Document query = new Document("_id", new ObjectId(id));
+            clientes.deleteOne(query);
+            System.out.println("Cliente removido com sucesso!");
         }
     }
 
-    public static Cliente buscarPorId(int idCliente) {
-        String sql = "SELECT * FROM Cliente WHERE idCliente = ?";
-        Cliente cliente = null;
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idCliente);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    cliente = new Cliente();
-                    cliente.setIdCliente(rs.getInt("idCliente"));
-                    cliente.setNome(rs.getString("nome"));
-                    cliente.setCpf(rs.getString("cpf"));
-                    cliente.setTelefone(rs.getString("telefone"));
-                    cliente.setEmail(rs.getString("email"));
-                }
+    public static Cliente buscarPorId(String idCliente) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            Document query = new Document("_id", new ObjectId(idCliente));
+            Document doc = clientes.find(query).first();
+
+            if (doc != null) {
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(doc.getObjectId("_id").toHexString());
+                cliente.setNome(doc.getString("nome"));
+                cliente.setCpf(doc.getString("cpf"));
+                cliente.setTelefone(doc.getString("telefone"));
+                cliente.setEmail(doc.getString("email"));
+                return cliente;
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao buscar cliente: " + e.getMessage());
         }
-        return cliente;
+        return null;
     }
 
     @Override
     public String toString() {
         return "Cliente{" +
-                "idCliente=" + idCliente +
+                "idCliente='" + idCliente + '\'' +
                 ", nome='" + nome + '\'' +
                 ", cpf='" + cpf + '\'' +
                 ", telefone='" + telefone + '\'' +

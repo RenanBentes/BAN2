@@ -1,30 +1,30 @@
 package petshop;
 
+import com.mongodb.client.*;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import main.Conexao;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DescricaoServico {
-    private int idDescricaoServico;
+    private String idDescricaoServico; // Alterado para String, pois MongoDB usa ObjectId
     private String servicoDescricao;
     private double valor;
 
-    // Construtores
     public DescricaoServico() {}
 
-    public DescricaoServico(int idDescricaoServico, String servicoDescricao, double valor) {
-        this.idDescricaoServico = idDescricaoServico;
+    public DescricaoServico(String servicoDescricao, double valor) {
         this.servicoDescricao = servicoDescricao;
         this.valor = valor;
     }
 
     // Getters e Setters
-    public int getIdDescricaoServico() {
+    public String getIdDescricaoServico() {
         return idDescricaoServico;
     }
 
-    public void setIdDescricaoServico(int idDescricaoServico) {
+    public void setIdDescricaoServico(String idDescricaoServico) {
         this.idDescricaoServico = idDescricaoServico;
     }
 
@@ -53,47 +53,42 @@ public class DescricaoServico {
         System.out.println("Digite o valor do serviço: ");
         double valor = scanner.nextDouble();
 
-        DescricaoServico descricaoServico = new DescricaoServico(0, descricao, valor);
+        DescricaoServico descricaoServico = new DescricaoServico(descricao, valor);
 
-        String sql = "INSERT INTO DescricaoServico (servicoDescricao, valor) VALUES (?, ?)";
+        Document descricaoDoc = new Document("servicoDescricao", descricaoServico.getServicoDescricao())
+                .append("valor", descricaoServico.getValor());
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, descricaoServico.getServicoDescricao());
-            stmt.setDouble(2, descricaoServico.getValor());
-            stmt.executeUpdate();
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+            descricaoServicoCollection.insertOne(descricaoDoc);
             System.out.println("Descrição de serviço adicionada com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao adicionar descrição de serviço: " + e.getMessage());
         }
     }
 
     public static void listarDescricoesServico() {
         ArrayList<DescricaoServico> descricoes = new ArrayList<>();
-        String sql = "SELECT * FROM DescricaoServico";
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+            MongoCursor<Document> cursor = descricaoServicoCollection.find().iterator();
+
             System.out.println("Lista de Descrições de Serviço:");
-            while (rs.next()) {
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
                 DescricaoServico descricaoServico = new DescricaoServico();
-                descricaoServico.setIdDescricaoServico(rs.getInt("idDescricaoServico"));
-                descricaoServico.setServicoDescricao(rs.getString("servicoDescricao"));
-                descricaoServico.setValor(rs.getDouble("valor"));
+                descricaoServico.setIdDescricaoServico(doc.getObjectId("_id").toHexString());
+                descricaoServico.setServicoDescricao(doc.getString("servicoDescricao"));
+                descricaoServico.setValor(doc.getDouble("valor"));
                 System.out.println(descricaoServico);
                 descricoes.add(descricaoServico);
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar descrições de serviço: " + e.getMessage());
         }
     }
 
     public static void atualizarDescricaoServico() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da descrição de serviço a ser atualizada: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+        String id = scanner.nextLine();
 
         DescricaoServico descricaoServico = buscarPorId(id);
         if (descricaoServico != null) {
@@ -109,16 +104,13 @@ public class DescricaoServico {
                 descricaoServico.setValor(Double.parseDouble(valorStr));
             }
 
-            String sql = "UPDATE DescricaoServico SET servicoDescricao = ?, valor = ? WHERE idDescricaoServico = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, descricaoServico.getServicoDescricao());
-                stmt.setDouble(2, descricaoServico.getValor());
-                stmt.setInt(3, descricaoServico.getIdDescricaoServico());
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+                Document query = new Document("_id", new ObjectId(id));
+                Document update = new Document("$set", new Document("servicoDescricao", descricaoServico.getServicoDescricao())
+                        .append("valor", descricaoServico.getValor()));
+                descricaoServicoCollection.updateOne(query, update);
                 System.out.println("Descrição de serviço atualizada com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao atualizar descrição de serviço: " + e.getMessage());
             }
         } else {
             System.out.println("Descrição de serviço com ID " + id + " não encontrada.");
@@ -128,50 +120,42 @@ public class DescricaoServico {
     public static void removerDescricaoServico() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da descrição de serviço a ser removida: ");
-        int id = scanner.nextInt();
+        String id = scanner.nextLine();
 
         DescricaoServico descricaoServico = buscarPorId(id);
         if (descricaoServico != null) {
-            String sql = "DELETE FROM DescricaoServico WHERE idDescricaoServico = ?";
-            try (Connection conn = Conexao.conectar();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
+            try (MongoClient mongoClient = Conexao.getConexao()) {
+                MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+                Document query = new Document("_id", new ObjectId(id));
+                descricaoServicoCollection.deleteOne(query);
                 System.out.println("Descrição de serviço removida com sucesso!");
-            } catch (SQLException e) {
-                System.out.println("Erro ao remover descrição de serviço: " + e.getMessage());
             }
         } else {
             System.out.println("Descrição de serviço com ID " + id + " não encontrada.");
         }
     }
 
-    public static DescricaoServico buscarPorId(int idDescricaoServico) {
-        String sql = "SELECT * FROM DescricaoServico WHERE idDescricaoServico = ?";
-        DescricaoServico descricaoServico = null;
+    public static DescricaoServico buscarPorId(String idDescricaoServico) {
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+            Document query = new Document("_id", new ObjectId(idDescricaoServico));
+            Document doc = descricaoServicoCollection.find(query).first();
 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idDescricaoServico);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    descricaoServico = new DescricaoServico();
-                    descricaoServico.setIdDescricaoServico(rs.getInt("idDescricaoServico"));
-                    descricaoServico.setServicoDescricao(rs.getString("servicoDescricao"));
-                    descricaoServico.setValor(rs.getDouble("valor"));
-                }
+            if (doc != null) {
+                DescricaoServico descricaoServico = new DescricaoServico();
+                descricaoServico.setIdDescricaoServico(doc.getObjectId("_id").toHexString());
+                descricaoServico.setServicoDescricao(doc.getString("servicoDescricao"));
+                descricaoServico.setValor(doc.getDouble("valor"));
+                return descricaoServico;
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao buscar descrição de serviço: " + e.getMessage());
         }
-
-        return descricaoServico;
+        return null;
     }
 
     @Override
     public String toString() {
         return "DescricaoServico{" +
-                "idDescricaoServico=" + idDescricaoServico +
+                "idDescricaoServico='" + idDescricaoServico + '\'' +
                 ", servicoDescricao='" + servicoDescricao + '\'' +
                 ", valor=" + valor +
                 '}';
