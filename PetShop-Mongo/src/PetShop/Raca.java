@@ -1,4 +1,4 @@
-package petshop;
+package PetShop;
 
 import com.mongodb.client.*;
 import org.bson.Document;
@@ -47,7 +47,7 @@ public class Raca {
         Document racaDoc = new Document("descricao", raca.getDescricao());
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
             racasCollection.insertOne(racaDoc);
             System.out.println("Raça cadastrada com sucesso!");
         }
@@ -58,7 +58,7 @@ public class Raca {
         ArrayList<Raca> racas = new ArrayList<>();
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
             MongoCursor<Document> cursor = racasCollection.find().iterator();
 
             System.out.println("Lista de Raças:");
@@ -87,7 +87,7 @@ public class Raca {
             raca.setDescricao(novaDescricao);
 
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+                MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
                 Document query = new Document("_id", new ObjectId(id));
                 Document update = new Document("$set", new Document("descricao", raca.getDescricao()));
                 racasCollection.updateOne(query, update);
@@ -107,7 +107,7 @@ public class Raca {
         Raca raca = buscarPorId(id);
         if (raca != null) {
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+                MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
                 Document query = new Document("_id", new ObjectId(id));
                 racasCollection.deleteOne(query);
                 System.out.println("Raça removida com sucesso!");
@@ -120,7 +120,7 @@ public class Raca {
     // Busca uma raça pelo ID
     public static Raca buscarPorId(String idPetRaca) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> racasCollection = mongoClient.getDatabase("petshop").getCollection("Raca");
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
             Document query = new Document("_id", new ObjectId(idPetRaca));
             Document doc = racasCollection.find(query).first();
 

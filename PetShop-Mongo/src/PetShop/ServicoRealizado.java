@@ -1,4 +1,4 @@
-package petshop;
+package PetShop;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;

@@ -1,4 +1,4 @@
-package petshop;
+package PetShop;
 
 import com.mongodb.client.*;
 import org.bson.Document;
@@ -65,7 +65,7 @@ public class Cliente {
 
     public static boolean existeCliente(String cpf) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
             Document query = new Document("cpf", cpf);
             long count = clientes.countDocuments(query);
             return count > 0;
@@ -98,7 +98,7 @@ public class Cliente {
 
     public static void listarClientes() {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
             MongoCursor<Document> cursor = clientes.find().iterator();
 
             System.out.println("Lista de Clientes:");
@@ -143,7 +143,7 @@ public class Cliente {
             }
 
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+                MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
                 Document query = new Document("_id", new ObjectId(id));
                 Document update = new Document("$set", new Document("nome", cliente.getNome())
                         .append("cpf", cliente.getCpf())
@@ -163,7 +163,7 @@ public class Cliente {
         String id = scanner.nextLine();
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
             Document query = new Document("_id", new ObjectId(id));
             clientes.deleteOne(query);
             System.out.println("Cliente removido com sucesso!");
@@ -172,7 +172,7 @@ public class Cliente {
 
     public static Cliente buscarPorId(String idCliente) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> clientes = mongoClient.getDatabase("petshop").getCollection("Cliente");
+            MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
             Document query = new Document("_id", new ObjectId(idCliente));
             Document doc = clientes.find(query).first();
 

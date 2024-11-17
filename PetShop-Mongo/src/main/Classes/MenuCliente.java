@@ -1,6 +1,6 @@
 package main.Classes;
 
-import petshop.Cliente;
+import PetShop.Cliente;
 import java.util.Scanner;
 
 public class MenuCliente {

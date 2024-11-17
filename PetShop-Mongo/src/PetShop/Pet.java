@@ -1,4 +1,4 @@
-package petshop;
+package PetShop;
 
 import com.mongodb.client.*;
 import org.bson.Document;
@@ -86,7 +86,7 @@ public class Pet {
                 .append("idPetRaca", pet.getIdPetRaca());
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
             petsCollection.insertOne(petDoc);
             System.out.println("Pet adicionado com sucesso!");
         }
@@ -97,7 +97,7 @@ public class Pet {
         ArrayList<Pet> pets = new ArrayList<>();
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
             MongoCursor<Document> cursor = petsCollection.find().iterator();
 
             System.out.println("Lista de Pets:");
@@ -149,7 +149,7 @@ public class Pet {
             }
 
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+                MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
                 Document query = new Document("_id", new ObjectId(id));
                 Document update = new Document("$set", new Document("nome", pet.getNome())
                         .append("dataNascimento", pet.getDataNascimento())
@@ -170,7 +170,7 @@ public class Pet {
         Pet pet = buscarPorId(id);
         if (pet != null) {
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+                MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
                 Document query = new Document("_id", new ObjectId(id));
                 petsCollection.deleteOne(query);
                 System.out.println("Pet removido com sucesso!");
@@ -182,7 +182,7 @@ public class Pet {
 
     public static Pet buscarPorId(String idPet) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("petshop").getCollection("Pet");
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
             Document query = new Document("_id", new ObjectId(idPet));
             Document doc = petsCollection.find(query).first();
 
@@ -190,8 +190,8 @@ public class Pet {
                 Pet pet = new Pet();
                 pet.setIdPet(doc.getObjectId("_id").toHexString());
                 pet.setNome(doc.getString("nome"));
-                pet.setDataNascimento(doc.getDate("dataNascimento"));
-                pet.setIdPetRaca(doc.getInteger("idPetRaca"));
+                pet.setDataNascimento(doc.getDate("datanascimento"));
+                pet.setIdPetRaca(doc.getInteger("idpetraca"));
                 return pet;
             }
         }

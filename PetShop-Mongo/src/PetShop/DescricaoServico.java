@@ -1,4 +1,4 @@
-package petshop;
+package PetShop;
 
 import com.mongodb.client.*;
 import org.bson.Document;
@@ -59,7 +59,7 @@ public class DescricaoServico {
                 .append("valor", descricaoServico.getValor());
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
             descricaoServicoCollection.insertOne(descricaoDoc);
             System.out.println("Descrição de serviço adicionada com sucesso!");
         }
@@ -69,7 +69,7 @@ public class DescricaoServico {
         ArrayList<DescricaoServico> descricoes = new ArrayList<>();
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
             MongoCursor<Document> cursor = descricaoServicoCollection.find().iterator();
 
             System.out.println("Lista de Descrições de Serviço:");
@@ -77,7 +77,7 @@ public class DescricaoServico {
                 Document doc = cursor.next();
                 DescricaoServico descricaoServico = new DescricaoServico();
                 descricaoServico.setIdDescricaoServico(doc.getObjectId("_id").toHexString());
-                descricaoServico.setServicoDescricao(doc.getString("servicoDescricao"));
+                descricaoServico.setServicoDescricao(doc.getString("servicodescricao"));
                 descricaoServico.setValor(doc.getDouble("valor"));
                 System.out.println(descricaoServico);
                 descricoes.add(descricaoServico);
@@ -105,7 +105,7 @@ public class DescricaoServico {
             }
 
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+                MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
                 Document query = new Document("_id", new ObjectId(id));
                 Document update = new Document("$set", new Document("servicoDescricao", descricaoServico.getServicoDescricao())
                         .append("valor", descricaoServico.getValor()));
@@ -125,7 +125,7 @@ public class DescricaoServico {
         DescricaoServico descricaoServico = buscarPorId(id);
         if (descricaoServico != null) {
             try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+                MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
                 Document query = new Document("_id", new ObjectId(id));
                 descricaoServicoCollection.deleteOne(query);
                 System.out.println("Descrição de serviço removida com sucesso!");
@@ -137,7 +137,7 @@ public class DescricaoServico {
 
     public static DescricaoServico buscarPorId(String idDescricaoServico) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("petshop").getCollection("DescricaoServico");
+            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
             Document query = new Document("_id", new ObjectId(idDescricaoServico));
             Document doc = descricaoServicoCollection.find(query).first();
 

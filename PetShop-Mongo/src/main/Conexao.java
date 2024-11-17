@@ -10,7 +10,7 @@ public class Conexao {
     private static final String URI = "mongodb://localhost:27017";
     private static final String DATABASE_NAME = "PetShop";
     private static MongoDatabase database;
-    private static MongoClient mongoClient; // Cliente MongoDB reutilizável
+    private static MongoClient mongoClient;
 
     public static MongoDatabase getDatabase() {
         if (database == null) {
@@ -31,13 +31,5 @@ public class Conexao {
         return mongoClient;
     }
 
-    public static void closeConnection() {
-        if (mongoClient != null) {
-            mongoClient.close();
-            mongoClient = null;
-            database = null;
-            System.out.println("Conexão com o MongoDB fechada.");
-        }
-    }
 }
 
