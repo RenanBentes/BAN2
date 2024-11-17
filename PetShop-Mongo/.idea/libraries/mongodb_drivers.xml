@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="mongodb-drivers">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Downloads/mongodb-driver-sync-5.2.1.jar!/" />
-      <root url="jar://$USER_HOME$/Downloads/mongo-java-driver-3.12.14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/libraries/mongo-java-driver-3.12.14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/libraries/mongodb-driver-sync-5.2.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
