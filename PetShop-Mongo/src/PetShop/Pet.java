@@ -82,20 +82,17 @@ public class Pet {
                 Document doc = cursor.next();
                 Pet pet = new Pet();
 
-                // Obtendo o id como String
                 pet.setIdPet(doc.getString("_id")); // Aqui é obtido como String diretamente
                 pet.setNome(doc.getString("nome"));
                 pet.setDataNascimento(doc.getDate("dataNascimento"));
 
-                // Verificando se o campo idPetRaca não é nulo antes de acessar
                 Integer idPetRaca = doc.getInteger("idPetRaca");
                 if (idPetRaca != null) {
                     pet.setIdPetRaca(idPetRaca);
                 } else {
-                    pet.setIdPetRaca(0); // Definindo um valor padrão caso seja nulo
+                    pet.setIdPetRaca(0);
                 }
 
-                // Exibe a data no formato correto
                 System.out.println("ID: " + pet.getIdPet() +
                         ", Nome: " + pet.getNome() +
                         ", Data de Nascimento: " + dateFormat.format(pet.getDataNascimento()) +
