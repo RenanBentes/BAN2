@@ -11,7 +11,7 @@ import java.util.Scanner;
 import main.Conexao;
 
 public class Pet {
-    private String idPet; // Alterado para String, pois MongoDB usa ObjectId
+    private String idPet; // Identificador do MongoDB
     private String nome;
     private Date dataNascimento;
     private int idPetRaca;
@@ -26,39 +26,21 @@ public class Pet {
     }
 
     // Getters e Setters
-    public String getIdPet() {
-        return idPet;
-    }
+    public String getIdPet() { return idPet; }
+    public void setIdPet(String idPet) { this.idPet = idPet; }
 
-    public void setIdPet(String idPet) {
-        this.idPet = idPet;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public Date getDataNascimento() { return dataNascimento; }
+    public void setDataNascimento(Date dataNascimento) { this.dataNascimento = dataNascimento; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public int getIdPetRaca() { return idPetRaca; }
+    public void setIdPetRaca(int idPetRaca) { this.idPetRaca = idPetRaca; }
 
-    public Date getDataNascimento() {
-        return dataNascimento;
-    }
+    // Métodos CRUD
 
-    public void setDataNascimento(Date dataNascimento) {
-        this.dataNascimento = dataNascimento;
-    }
-
-    public int getIdPetRaca() {
-        return idPetRaca;
-    }
-
-    public void setIdPetRaca(int idPetRaca) {
-        this.idPetRaca = idPetRaca;
-    }
-
-    // Adiciona um novo pet ao banco de dados
+    // Adicionar um pet
     public static void adicionarPet() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -68,9 +50,9 @@ public class Pet {
 
         System.out.println("Digite a data de nascimento do pet (dd/MM/yyyy): ");
         String dataStr = scanner.nextLine();
-        Date dataNascimento = null;
+        Date dataNascimento;
         try {
-            dataNascimento = dateFormat.parse(dataStr);
+            dataNascimento = dateFormat.parse(dataStr); // Formato de entrada
         } catch (ParseException e) {
             System.out.println("Erro: Data em formato inválido.");
             return;
@@ -80,9 +62,8 @@ public class Pet {
         int idPetRaca = scanner.nextInt();
 
         Pet pet = new Pet(nome, dataNascimento, idPetRaca);
-
         Document petDoc = new Document("nome", pet.getNome())
-                .append("dataNascimento", pet.getDataNascimento())
+                .append("dataNascimento", pet.getDataNascimento())  // MongoDB armazenará como ISODate
                 .append("idPetRaca", pet.getIdPetRaca());
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
@@ -92,8 +73,9 @@ public class Pet {
         }
     }
 
+    // Listar todos os pets
     public static void listarPets() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Formato de exibição
         ArrayList<Pet> pets = new ArrayList<>();
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
@@ -108,6 +90,8 @@ public class Pet {
                 pet.setNome(doc.getString("nome"));
                 pet.setDataNascimento(doc.getDate("dataNascimento"));
                 pet.setIdPetRaca(doc.getInteger("idPetRaca"));
+
+                // Exibe a data no formato correto
                 System.out.println("ID: " + pet.getIdPet() +
                         ", Nome: " + pet.getNome() +
                         ", Data de Nascimento: " + dateFormat.format(pet.getDataNascimento()) +
@@ -117,6 +101,7 @@ public class Pet {
         }
     }
 
+    // Atualizar dados de um pet
     public static void atualizarPet() {
         Scanner scanner = new Scanner(System.in);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -132,7 +117,8 @@ public class Pet {
             if (!nome.isEmpty()) {
                 pet.setNome(nome);
             }
-            System.out.println("Nova data de nascimento (deixe em branco para manter a atual, formato dd/MM/yyyy): ");
+
+            System.out.println("Nova data de nascimento (deixe em branco para manter a atual): ");
             String dataStr = scanner.nextLine();
             if (!dataStr.isEmpty()) {
                 try {
@@ -142,6 +128,7 @@ public class Pet {
                     return;
                 }
             }
+
             System.out.println("Novo ID de raça (deixe em branco para manter o atual): ");
             String idPetRacaStr = scanner.nextLine();
             if (!idPetRacaStr.isEmpty()) {
@@ -158,40 +145,35 @@ public class Pet {
                 System.out.println("Pet atualizado com sucesso!");
             }
         } else {
-            System.out.println("Pet com ID " + id + " não encontrado.");
+            System.out.println("Pet não encontrado.");
         }
     }
 
+    // Remover um pet
     public static void removerPet() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID do pet a ser removido: ");
         String id = scanner.nextLine();
 
-        Pet pet = buscarPorId(id);
-        if (pet != null) {
-            try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
-                Document query = new Document("_id", new ObjectId(id));
-                petsCollection.deleteOne(query);
-                System.out.println("Pet removido com sucesso!");
-            }
-        } else {
-            System.out.println("Pet com ID " + id + " não encontrado.");
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
+            petsCollection.deleteOne(new Document("_id", new ObjectId(id)));
+            System.out.println("Pet removido com sucesso!");
         }
     }
 
+    // Buscar um pet por ID
     public static Pet buscarPorId(String idPet) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
-            Document query = new Document("_id", new ObjectId(idPet));
-            Document doc = petsCollection.find(query).first();
+            Document doc = petsCollection.find(new Document("_id", new ObjectId(idPet))).first();
 
             if (doc != null) {
                 Pet pet = new Pet();
                 pet.setIdPet(doc.getObjectId("_id").toHexString());
                 pet.setNome(doc.getString("nome"));
-                pet.setDataNascimento(doc.getDate("datanascimento"));
-                pet.setIdPetRaca(doc.getInteger("idpetraca"));
+                pet.setDataNascimento(doc.getDate("dataNascimento"));
+                pet.setIdPetRaca(doc.getInteger("idPetRaca"));
                 return pet;
             }
         }

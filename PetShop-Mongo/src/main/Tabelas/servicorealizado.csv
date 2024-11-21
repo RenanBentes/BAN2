@@ -1,7 +1,7 @@
-idservico,iddescricaoservico,idpet,data,status
-1,1,1,2024-09-01,Concluído
-2,2,2,2024-09-05,Em andamento
-3,3,3,2024-09-10,Concluído
-4,4,4,2024-09-15,Cancelado
-5,5,5,2024-09-20,Concluído
-6,6,6,2024-09-25,Em andamento
+idpet,nome,idpetraca,datanascimento
+1,Rex,1,2022-05-03
+2,Mia,2,2023-09-07
+3,Luna,3,2023-09-07
+4,Max,4,2023-05-03
+5,Bella,5,2022-08-12
+6,Charlie,3,2021-07-03

@@ -15,13 +15,6 @@ public class Cliente {
 
     public Cliente() {}
 
-    public Cliente(String nome, String cpf, String telefone, String email) {
-        this.nome = nome;
-        this.cpf = cpf;
-        this.telefone = telefone;
-        this.email = email;
-    }
-
     // Getters e Setters
     public String getIdCliente() {
         return idCliente;
