@@ -7,7 +7,7 @@ import java.util.Scanner;
 import main.Conexao;
 
 public class Cliente {
-    private String idCliente;
+    private int idCliente;
     private String nome;
     private String cpf;
     private String telefone;
@@ -16,11 +16,11 @@ public class Cliente {
     public Cliente() {}
 
     // Getters e Setters
-    public String getIdCliente() {
+    public int getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(String idCliente) {
+    public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
     }
 
@@ -171,7 +171,7 @@ public class Cliente {
 
             if (doc != null) {
                 Cliente cliente = new Cliente();
-                cliente.setIdCliente(doc.getObjectId("_id").toHexString());
+                cliente.setIdCliente(doc.getInteger("idCliente"));
                 cliente.setNome(doc.getString("nome"));
                 cliente.setCpf(doc.getString("cpf"));
                 cliente.setTelefone(doc.getString("telefone"));

@@ -1,8 +1,8 @@
-iddescricaoservico,servicodescricao,valor,idpetraca
-1,Banho,30.00,1
-2,Banho,40.00,2
-3,Tosa,50.00,1
-4,Banho,50.00,4
+idDescricaoServico,servicoDescricao,valor,idPetRaca
+1,Banho,70.00,1
+2,Banho,90.00,2
+3,Banho,120.00,3
+4,Tosa,200.00,2
 5,Tosa,150.00,3
-6,Banho,100.00,3
-7,Corte de Unhas,40.00,2
+6,Banho,50.00,4
+7,Banho,60.00,5
