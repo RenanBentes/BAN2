@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/BAN2.iml" filepath="$PROJECT_DIR$/.idea/BAN2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PetShop-Mongo/PetShop-Mongo.iml" filepath="$PROJECT_DIR$/PetShop-Mongo/PetShop-Mongo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Petshop/Petshop.iml" filepath="$PROJECT_DIR$/Petshop/Petshop.iml" />
+    </modules>
+  </component>
+</project>
