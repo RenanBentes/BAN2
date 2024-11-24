@@ -1,6 +1,6 @@
-package main;
+package main.Classes;
 
-import petshop.Pet;
+import PetShop.Pet;
 import java.util.Scanner;
 
 public class MenuPet {

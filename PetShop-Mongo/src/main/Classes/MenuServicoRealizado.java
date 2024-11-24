@@ -1,6 +1,6 @@
-package main;
+package main.Classes;
 
-import petshop.ServicoRealizado;
+import PetShop.ServicoRealizado;
 import java.util.Scanner;
 
 public class MenuServicoRealizado {
