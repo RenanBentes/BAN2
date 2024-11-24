@@ -16,11 +16,7 @@ public class Cliente {
     public Cliente() {}
 
     // Getters e Setters
-<<<<<<< HEAD
-    public long getIdCliente() {
-=======
     public int getIdCliente() {
->>>>>>> origin/final
         return idCliente;
     }
 
@@ -64,15 +60,14 @@ public class Cliente {
     public static boolean existeCliente(String cpf) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
-            Document query = new Document("cpf", cpf);
-            return clientes.countDocuments(query) > 0;
+            return clientes.countDocuments(new Document("cpf", cpf)) > 0;
         } catch (Exception e) {
             System.err.println("Erro ao verificar a existência do cliente: " + e.getMessage());
             return false;
         }
     }
 
-    // Adiciona um novo cliente ao banco de dados
+    // Adicionar um novo cliente
     public static void adicionarCliente() {
         Scanner scanner = new Scanner(System.in);
 
@@ -82,9 +77,8 @@ public class Cliente {
         System.out.println("Digite o CPF do cliente: ");
         String cpf = scanner.nextLine().trim();
 
-        // Validação de CPF básico
         if (cpf.length() != 11 || !cpf.matches("\\d+")) {
-            System.out.println("Erro: CPF inválido. Certifique-se de que o CPF tenha 11 dígitos numéricos.");
+            System.out.println("Erro: CPF inválido. Certifique-se de que tenha 11 dígitos numéricos.");
             return;
         }
 
@@ -94,7 +88,6 @@ public class Cliente {
         System.out.println("Digite o email do cliente: ");
         String email = scanner.nextLine().trim();
 
-        // Verifica se o cliente já existe
         if (existeCliente(cpf)) {
             System.out.println("Erro: Cliente com CPF " + cpf + " já existe.");
             return;
@@ -102,8 +95,11 @@ public class Cliente {
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> clientes = mongoClient.getDatabase("PetShop").getCollection("Cliente");
-            Document ultimoCliente = clientes.find().sort(new Document("idCliente", -1)).first();
-            long novoIdCliente = (ultimoCliente != null) ? ultimoCliente.getLong("idCliente") + 1 : 1;
+
+            int novoIdCliente = clientes.find()
+                    .sort(new Document("idCliente", -1))
+                    .first()
+                    .getInteger("idCliente", 0) + 1;
 
             Document clienteDoc = new Document("idCliente", novoIdCliente)
                     .append("nome", nome)
@@ -121,37 +117,30 @@ public class Cliente {
     // Listar todos os clientes
     public static void listarClientes() {
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoDatabase database = mongoClient.getDatabase("PetShop");
-            MongoCollection<Document> clientesCollection = database.getCollection("Cliente");
+            MongoCollection<Document> clientesCollection = mongoClient.getDatabase("PetShop").getCollection("Cliente");
 
             System.out.println("Lista de Clientes:");
             for (Document doc : clientesCollection.find()) {
-                Cliente cliente = new Cliente();
-                cliente.setIdCliente(doc.getInteger("idCliente"));
-                cliente.setNome(doc.getString("nome"));
-                cliente.setCpf(doc.getString("cpf"));
-                cliente.setTelefone(doc.getString("telefone"));
-                cliente.setEmail(doc.getString("email"));
-
-                System.out.println("ID: " + cliente.getIdCliente() +
-                        ", Nome: " + cliente.getNome() +
-                        ", CPF: " + cliente.getCpf() +
-                        ", Telefone: " + cliente.getTelefone() +
-                        ", Email: " + cliente.getEmail());
+                System.out.println("ID: " + doc.getInteger("idCliente") +
+                        ", Nome: " + doc.getString("nome") +
+                        ", CPF: " + doc.getString("cpf") +
+                        ", Telefone: " + doc.getString("telefone") +
+                        ", Email: " + doc.getString("email"));
             }
+        } catch (Exception e) {
+            System.err.println("Erro ao listar os clientes: " + e.getMessage());
         }
     }
 
-    // Atualizar as informações de um cliente
+    // Atualizar um cliente
     public static void atualizarCliente() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Digite o ID do cliente a ser atualizado: ");
-        long idCliente = Long.parseLong(scanner.nextLine());
+        int idCliente = Integer.parseInt(scanner.nextLine());
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoDatabase database = mongoClient.getDatabase("PetShop");
-            MongoCollection<Document> clientesCollection = database.getCollection("Cliente");
+            MongoCollection<Document> clientesCollection = mongoClient.getDatabase("PetShop").getCollection("Cliente");
 
             Document clienteDoc = clientesCollection.find(new Document("idCliente", idCliente)).first();
             if (clienteDoc == null) {
@@ -159,50 +148,46 @@ public class Cliente {
                 return;
             }
 
-            Cliente cliente = new Cliente();
-            cliente.setIdCliente(clienteDoc.getInteger("idCliente"));
-            cliente.setNome(clienteDoc.getString("nome"));
-            cliente.setCpf(clienteDoc.getString("cpf"));
-            cliente.setTelefone(clienteDoc.getString("telefone"));
-            cliente.setEmail(clienteDoc.getString("email"));
-
-            System.out.println("Atualizando informações do cliente: " + cliente.getNome());
+            System.out.println("Atualizando informações do cliente: " + clienteDoc.getString("nome"));
 
             System.out.println("Novo nome (deixe em branco para manter o atual): ");
             String nome = scanner.nextLine();
-            if (!nome.isEmpty()) cliente.setNome(nome);
+            if (nome.isEmpty()) nome = clienteDoc.getString("nome");
 
             System.out.println("Novo CPF (deixe em branco para manter o atual): ");
             String cpf = scanner.nextLine();
-            if (!cpf.isEmpty()) cliente.setCpf(cpf);
+            if (cpf.isEmpty()) cpf = clienteDoc.getString("cpf");
 
             System.out.println("Novo telefone (deixe em branco para manter o atual): ");
             String telefone = scanner.nextLine();
-            if (!telefone.isEmpty()) cliente.setTelefone(telefone);
+            if (telefone.isEmpty()) telefone = clienteDoc.getString("telefone");
 
             System.out.println("Novo email (deixe em branco para manter o atual): ");
             String email = scanner.nextLine();
-            if (!email.isEmpty()) cliente.setEmail(email);
+            if (email.isEmpty()) email = clienteDoc.getString("email");
 
-            Document update = new Document("$set", new Document("nome", cliente.getNome())
-                    .append("cpf", cliente.getCpf())
-                    .append("telefone", cliente.getTelefone())
-                    .append("email", cliente.getEmail()));
+            Document update = new Document("$set", new Document("nome", nome)
+                    .append("cpf", cpf)
+                    .append("telefone", telefone)
+                    .append("email", email));
 
             clientesCollection.updateOne(new Document("idCliente", idCliente), update);
             System.out.println("Cliente atualizado com sucesso!");
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar o cliente: " + e.getMessage());
         }
     }
 
-    // Remover cliente
+    // Remover um cliente
     public static void removerCliente() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Digite o ID do cliente a ser removido: ");
-        long idCliente = Long.parseLong(scanner.nextLine());
+        int idCliente = Integer.parseInt(scanner.nextLine());
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> clientesCollection = mongoClient.getDatabase("PetShop").getCollection("Cliente");
+
             long deletedCount = clientesCollection.deleteOne(new Document("idCliente", idCliente)).getDeletedCount();
 
             if (deletedCount > 0) {
@@ -210,6 +195,8 @@ public class Cliente {
             } else {
                 System.out.println("Erro: Cliente não encontrado.");
             }
+        } catch (Exception e) {
+            System.err.println("Erro ao remover o cliente: " + e.getMessage());
         }
     }
 }

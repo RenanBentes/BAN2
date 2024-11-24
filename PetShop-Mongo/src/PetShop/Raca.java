@@ -2,28 +2,23 @@ package PetShop;
 
 import com.mongodb.client.*;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import main.Conexao;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Raca {
-    private String idPetRaca; // Alterado para String, pois MongoDB usa ObjectId
+    private int idPetRaca;
     private String descricao;
 
-    // Construtores
+    // Construtor
     public Raca() {}
 
-    public Raca(String descricao) {
-        this.descricao = descricao;
-    }
-
     // Getters e Setters
-    public String getIdPetRaca() {
+    public int getIdPetRaca() {
         return idPetRaca;
     }
 
-    public void setIdPetRaca(String idPetRaca) {
+    public void setIdPetRaca(int idPetRaca) {
         this.idPetRaca = idPetRaca;
     }
 
@@ -38,107 +33,98 @@ public class Raca {
     // Adiciona uma nova raça
     public static void adicionarRaca() {
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("Digite a descrição da raça: ");
-        String descricao = scanner.nextLine();
+        String descricao = scanner.nextLine().trim();
 
-        Raca raca = new Raca(descricao);
-
-        Document racaDoc = new Document("descricao", raca.getDescricao());
+        if (descricao.isEmpty()) {
+            System.out.println("Erro: A descrição não pode estar vazia.");
+            return;
+        }
 
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
+
+            // Geração automática de ID
+            Document ultimaRaca = racasCollection.find().sort(new Document("idPetRaca", -1)).first();
+            int novoId = (ultimaRaca != null) ? ultimaRaca.getInteger("idPetRaca") + 1 : 1;
+
+            Document racaDoc = new Document("idPetRaca", novoId)
+                    .append("descricao", descricao);
+
             racasCollection.insertOne(racaDoc);
-            System.out.println("Raça cadastrada com sucesso!");
+            System.out.println("Raça cadastrada com sucesso! ID: " + novoId);
+        } catch (Exception e) {
+            System.err.println("Erro ao adicionar raça: " + e.getMessage());
         }
     }
 
     // Lista todas as raças
     public static void listarRacas() {
-        ArrayList<Raca> racas = new ArrayList<>();
-
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
-            MongoCursor<Document> cursor = racasCollection.find().iterator();
 
             System.out.println("Lista de Raças:");
-            while (cursor.hasNext()) {
-                Document doc = cursor.next();
-                Raca raca = new Raca();
-                raca.setIdPetRaca(doc.getObjectId("_id").toHexString());
-                raca.setDescricao(doc.getString("descricao"));
-                System.out.println("ID: " + raca.getIdPetRaca() + ", Descrição: " + raca.getDescricao());
-                racas.add(raca);
+            for (Document doc : racasCollection.find()) {
+                int id = doc.getInteger("idPetRaca");
+                String descricao = doc.getString("descricao");
+                System.out.println("ID: " + id + ", Descrição: " + descricao);
             }
+        } catch (Exception e) {
+            System.err.println("Erro ao listar raças: " + e.getMessage());
         }
     }
 
-    // Atualiza informações de uma raça
+    // Atualiza uma raça pelo ID
     public static void atualizarRaca() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Digite o ID da raça que deseja atualizar: ");
-        String id = scanner.nextLine();
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Limpa o buffer
 
-        Raca raca = buscarPorId(id);
-        if (raca != null) {
-            System.out.println("Digite a nova descrição da raça: ");
-            String novaDescricao = scanner.nextLine();
-            raca.setDescricao(novaDescricao);
+        try (MongoClient mongoClient = Conexao.getConexao()) {
+            MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
-            try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
-                Document query = new Document("_id", new ObjectId(id));
-                Document update = new Document("$set", new Document("descricao", raca.getDescricao()));
-                racasCollection.updateOne(query, update);
-                System.out.println("Raça atualizada com sucesso!");
+            Document racaDoc = racasCollection.find(new Document("idPetRaca", id)).first();
+            if (racaDoc == null) {
+                System.out.println("Erro: Raça com ID " + id + " não encontrada.");
+                return;
             }
-        } else {
-            System.out.println("Raça com ID " + id + " não encontrada.");
+
+            System.out.println("Digite a nova descrição da raça: ");
+            String novaDescricao = scanner.nextLine().trim();
+
+            if (novaDescricao.isEmpty()) {
+                System.out.println("Erro: A descrição não pode estar vazia.");
+                return;
+            }
+
+            Document update = new Document("$set", new Document("descricao", novaDescricao));
+            racasCollection.updateOne(new Document("idPetRaca", id), update);
+            System.out.println("Raça atualizada com sucesso!");
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar raça: " + e.getMessage());
         }
     }
 
     // Remove uma raça pelo ID
     public static void removerRaca() {
         Scanner scanner = new Scanner(System.in);
+
         System.out.println("Digite o ID da raça que deseja remover: ");
-        String id = scanner.nextLine();
+        int id = scanner.nextInt();
 
-        Raca raca = buscarPorId(id);
-        if (raca != null) {
-            try (MongoClient mongoClient = Conexao.getConexao()) {
-                MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
-                Document query = new Document("_id", new ObjectId(id));
-                racasCollection.deleteOne(query);
-                System.out.println("Raça removida com sucesso!");
-            }
-        } else {
-            System.out.println("Raça com ID " + id + " não encontrada.");
-        }
-    }
-
-    // Busca uma raça pelo ID
-    public static Raca buscarPorId(String idPetRaca) {
         try (MongoClient mongoClient = Conexao.getConexao()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
-            Document query = new Document("_id", new ObjectId(idPetRaca));
-            Document doc = racasCollection.find(query).first();
 
-            if (doc != null) {
-                Raca raca = new Raca();
-                raca.setIdPetRaca(doc.getObjectId("_id").toHexString());
-                raca.setDescricao(doc.getString("descricao"));
-                return raca;
+            long deletedCount = racasCollection.deleteOne(new Document("idPetRaca", id)).getDeletedCount();
+            if (deletedCount > 0) {
+                System.out.println("Raça removida com sucesso!");
+            } else {
+                System.out.println("Erro: Raça com ID " + id + " não encontrada.");
             }
+        } catch (Exception e) {
+            System.err.println("Erro ao remover raça: " + e.getMessage());
         }
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return "Raca{" +
-                "idPetRaca='" + idPetRaca + '\'' +
-                ", descricao='" + descricao + '\'' +
-                '}';
     }
 }
