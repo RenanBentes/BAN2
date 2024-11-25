@@ -3,7 +3,6 @@ package PetShop;
 import com.mongodb.client.*;
 import org.bson.Document;
 import main.Conexao;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Raca {
@@ -41,7 +40,7 @@ public class Raca {
             return;
         }
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
             // Geração automática de ID
@@ -60,7 +59,7 @@ public class Raca {
 
     // Lista todas as raças
     public static void listarRacas() {
-        try (MongoClient mongoClient = Conexao.getConexao()) {
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
             System.out.println("Lista de Raças:");
@@ -82,7 +81,7 @@ public class Raca {
         int id = scanner.nextInt();
         scanner.nextLine(); // Limpa o buffer
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
             Document racaDoc = racasCollection.find(new Document("idPetRaca", id)).first();
@@ -114,7 +113,7 @@ public class Raca {
         System.out.println("Digite o ID da raça que deseja remover: ");
         int id = scanner.nextInt();
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
             long deletedCount = racasCollection.deleteOne(new Document("idPetRaca", id)).getDeletedCount();

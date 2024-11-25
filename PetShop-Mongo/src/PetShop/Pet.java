@@ -56,7 +56,6 @@ public class Pet {
         this.idCliente = idCliente;
     }
 
-
     public static void adicionarPet() {
         Scanner scanner = new Scanner(System.in);
 
@@ -74,8 +73,8 @@ public class Pet {
         int idCliente = scanner.nextInt();
         scanner.nextLine();
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> petsCollection = Conexao.getDatabase().getCollection("Pet");
 
             // Obter o maior ID existente
             int ultimoIdPet = petsCollection.find()
@@ -99,8 +98,8 @@ public class Pet {
     }
 
     public static void listarPets() {
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> petsCollection = Conexao.getDatabase().getCollection("Pet");
 
             System.out.println("Lista de Pets:");
             for (Document doc : petsCollection.find()) {
@@ -121,8 +120,8 @@ public class Pet {
         System.out.println("Digite o ID do pet a ser atualizado: ");
         int idPet = Integer.parseInt(scanner.nextLine());
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> petsCollection = Conexao.getDatabase().getCollection("Pet");
 
             // Buscar o pet pelo ID
             Document petDoc = petsCollection.find(new Document("idPet", idPet)).first();
@@ -168,8 +167,8 @@ public class Pet {
         System.out.println("Digite o ID do pet a ser removido: ");
         int idPet = Integer.parseInt(scanner.nextLine());
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> petsCollection = mongoClient.getDatabase("PetShop").getCollection("Pet");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> petsCollection = Conexao.getDatabase().getCollection("Pet");
 
             long deletedCount = petsCollection.deleteOne(new Document("idPet", idPet)).getDeletedCount();
 

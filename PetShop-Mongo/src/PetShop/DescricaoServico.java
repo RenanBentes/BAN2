@@ -2,7 +2,6 @@ package PetShop;
 
 import com.mongodb.client.*;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import main.Conexao;
 import java.util.Scanner;
 
@@ -75,22 +74,22 @@ public class DescricaoServico {
         int idPetRaca = scanner.nextInt();
 
         DescricaoServico descricaoServico = new DescricaoServico(idDescricaoServico, descricao, valor, idPetRaca);
-
         Document descricaoDoc = new Document("idDescricaoServico", descricaoServico.getIdDescricaoServico())
                 .append("servicoDescricao", descricaoServico.getServicoDescricao())
                 .append("valor", descricaoServico.getValor())
                 .append("idPetRaca", descricaoServico.getIdPetRaca());
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
+        // Conexão com o MongoDB
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> descricaoServicoCollection = Conexao.getDatabase().getCollection("DescricaoServico");
             descricaoServicoCollection.insertOne(descricaoDoc);
             System.out.println("Descrição de serviço adicionada com sucesso!");
         }
     }
 
     public static void listarDescricoesServico() {
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> descricaoServicoCollection = Conexao.getDatabase().getCollection("DescricaoServico");
 
             System.out.println("Lista de Descrições de Serviço:");
             for (Document doc : descricaoServicoCollection.find()) {
@@ -113,8 +112,8 @@ public class DescricaoServico {
         int idDescricaoServico = scanner.nextInt();
         scanner.nextLine(); // Consumir o \n após o nextInt()
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> descricaoServicoCollection = Conexao.getDatabase().getCollection("DescricaoServico");
 
             Document query = new Document("idDescricaoServico", idDescricaoServico);
             Document doc = descricaoServicoCollection.find(query).first();
@@ -150,8 +149,8 @@ public class DescricaoServico {
         System.out.println("Digite o ID da descrição de serviço a ser removida: ");
         int idDescricaoServico = scanner.nextInt();
 
-        try (MongoClient mongoClient = Conexao.getConexao()) {
-            MongoCollection<Document> descricaoServicoCollection = mongoClient.getDatabase("PetShop").getCollection("DescricaoServico");
+        try (MongoClient mongoClient = Conexao.getMongoClient()) {
+            MongoCollection<Document> descricaoServicoCollection = Conexao.getDatabase().getCollection("DescricaoServico");
 
             Document query = new Document("idDescricaoServico", idDescricaoServico);
             descricaoServicoCollection.deleteOne(query);
@@ -161,3 +160,4 @@ public class DescricaoServico {
         }
     }
 }
+
