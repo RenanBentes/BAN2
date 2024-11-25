@@ -16,7 +16,7 @@ public class SistemaGerecial {
         while (opcao != 0) {
             System.out.println("----- Sistema de Gerenciamento do PetShop -----");
             System.out.println("1. Gerenciar Clientes \n2. Gerenciar Pets \n3. Gerenciar Raças\n4. Gerenciar Serviços Realizados");
-            System.out.println("5. Gerenciar Descrição de Serviços \n0. Sair\nEscolha uma opção:");
+            System.out.println("5. Gerenciar Descrição de Serviços \n6. Gerenciar Relatórios\n0. Sair\nEscolha uma opção:");
             opcao = scanner.nextInt();
             scanner.nextLine();
 
@@ -35,6 +35,9 @@ public class SistemaGerecial {
                     break;
                 case 5:
                     MenuDescricaoServico.exibirMenu();
+                    break;
+                case 6:
+                    MenuRelatorio.exibirMenu();
                     break;
                 case 0:
                     System.out.println("Saindo do sistema...");
