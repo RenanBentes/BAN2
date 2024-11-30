@@ -18,6 +18,7 @@ public class MenuDescricaoServico {
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine();
+
             switch (opcao) {
                 case 1:
                     DescricaoServico.adicionarDescricaoServico();

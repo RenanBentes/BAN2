@@ -34,7 +34,8 @@ public class Relatorio {
 
             System.out.println("Relatório: Total de Pets por Cliente");
             for (Document doc : resultados) {
-                System.out.printf("Cliente: %s, Total de Pets: %d%n",
+                System.out.printf("Cliente ID: %s, Nome: %s, Total de Pets: %d%n",
+                        String.valueOf(doc.get("_id")),  // Converte o ID inteiro para String
                         doc.getString("nomeCliente"),
                         doc.getInteger("totalPets"));
             }
@@ -57,23 +58,30 @@ public class Relatorio {
 
             MongoCollection<Document> servicosCollection = database.getCollection("ServicoRealizado");
 
+            // Realizando a agregação
             List<Document> resultados = servicosCollection.aggregate(List.of(
                     new Document("$lookup", new Document("from", "Pet")
                             .append("localField", "idPet")
                             .append("foreignField", "idPet")
                             .append("as", "petInfo")),
+                    new Document("$unwind", "$petInfo"), // Desfazendo o array para acessar diretamente os campos de Pet
                     new Document("$project", new Document("idPet", 1)
                             .append("servico", "$descricao")
-                            .append("nomePet", new Document("$arrayElemAt", List.of("$petInfo.nome", 0)))),
+                            .append("nomePet", "$petInfo.nome")),  // Nome do pet agora diretamente acessado
                     new Document("$group", new Document("_id", "$idPet")
                             .append("totalServicos", new Document("$sum", 1))
                             .append("nomePet", new Document("$first", "$nomePet"))),
                     new Document("$sort", new Document("totalServicos", -1)) // Ordenação decrescente
             )).into(new ArrayList<>());
 
+            // Exibindo os resultados
             System.out.println("Relatório: Serviços Realizados por Pet");
             for (Document doc : resultados) {
-                System.out.printf("Pet: %s, Total de Serviços: %d%n", doc.getString("nomePet"), doc.getInteger("totalServicos"));
+                String petId = doc.get("_id") != null ? doc.get("_id").toString() : "Desconhecido"; // Garantir que o ID seja convertido
+                System.out.printf("Pet ID: %s, Nome: %s, Total de Serviços: %d%n",
+                        petId,
+                        doc.getString("nomePet"),
+                        doc.getInteger("totalServicos"));
             }
         } catch (Exception e) {
             System.err.println("Erro ao gerar o relatório: " + e.getMessage());
@@ -83,6 +91,7 @@ public class Relatorio {
             }
         }
     }
+
 
     public static void somaValoresPorServico() {
         MongoClient mongoClient = null;
@@ -120,4 +129,3 @@ public class Relatorio {
         }
     }
 }
-

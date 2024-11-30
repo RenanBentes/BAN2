@@ -16,6 +16,7 @@ public class MenuCliente {
             System.out.println("4. Remover Cliente");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
+
             opcao = scanner.nextInt();
             scanner.nextLine();
 
