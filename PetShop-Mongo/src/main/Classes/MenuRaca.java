@@ -2,6 +2,7 @@ package main.Classes;
 
 import java.util.Scanner;
 import PetShop.Raca;
+import main.Conexao;
 
 public class MenuRaca {
     private static Scanner scanner = new Scanner(System.in);
@@ -22,15 +23,19 @@ public class MenuRaca {
             switch (opcao) {
                 case 1:
                     Raca.adicionarRaca();
+                    Conexao.fecharConexao();
                     break;
                 case 2:
                     Raca.listarRacas();
+                    Conexao.fecharConexao();
                     break;
                 case 3:
                     Raca.atualizarRaca();
+                    Conexao.fecharConexao();
                     break;
                 case 4:
                     Raca.removerRaca();
+                    Conexao.fecharConexao();
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");

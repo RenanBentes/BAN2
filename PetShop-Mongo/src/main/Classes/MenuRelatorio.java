@@ -1,7 +1,6 @@
 package main.Classes;
 
 import PetShop.Relatorio;
-
 import java.util.Scanner;
 
 public class MenuRelatorio {
@@ -22,6 +21,7 @@ public class MenuRelatorio {
             switch (opcao) {
                 case 1:
                     Relatorio.totalPetsPorCliente();
+
                     break;
                 case 2:
                     Relatorio.servicosPorPet();

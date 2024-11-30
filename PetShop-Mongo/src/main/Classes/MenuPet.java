@@ -1,6 +1,8 @@
 package main.Classes;
 
 import PetShop.Pet;
+import main.Conexao;
+
 import java.util.Scanner;
 
 public class MenuPet {
@@ -16,21 +18,26 @@ public class MenuPet {
             System.out.println("4. Remover Pet");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
+
             opcao = scanner.nextInt();
             scanner.nextLine();
 
             switch (opcao) {
                 case 1:
                     Pet.adicionarPet();
+                    Conexao.fecharConexao();
                     break;
                 case 2:
                     Pet.listarPets();
+                    Conexao.fecharConexao();
                     break;
                 case 3:
                     Pet.atualizarPet();
+                    Conexao.fecharConexao();
                     break;
                 case 4:
                     Pet.removerPet();
+                    Conexao.fecharConexao();
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");

@@ -1,6 +1,8 @@
 package main.Classes;
 
 import PetShop.DescricaoServico;
+import main.Conexao;
+
 import java.util.Scanner;
 
 public class MenuDescricaoServico {
@@ -18,18 +20,23 @@ public class MenuDescricaoServico {
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine();
+
             switch (opcao) {
                 case 1:
                     DescricaoServico.adicionarDescricaoServico();
+                    Conexao.fecharConexao();
                     break;
                 case 2:
                     DescricaoServico.listarDescricoesServico();
+                    Conexao.fecharConexao();
                     break;
                 case 3:
                     DescricaoServico.atualizarDescricaoServico();
+                    Conexao.fecharConexao();
                     break;
                 case 4:
                     DescricaoServico.removerDescricaoServico();
+                    Conexao.fecharConexao();
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");

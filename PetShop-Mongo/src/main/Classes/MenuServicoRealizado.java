@@ -1,6 +1,8 @@
 package main.Classes;
 
 import PetShop.ServicoRealizado;
+import main.Conexao;
+
 import java.util.Scanner;
 
 public class MenuServicoRealizado {
@@ -22,15 +24,19 @@ public class MenuServicoRealizado {
             switch (opcao) {
                 case 1:
                     ServicoRealizado.adicionarServico();
+                    Conexao.fecharConexao();
                     break;
                 case 2:
                     ServicoRealizado.listarServicos();
+                    Conexao.fecharConexao();
                     break;
                 case 3:
                     ServicoRealizado.atualizarServico();
+                    Conexao.fecharConexao();
                     break;
                 case 4:
                     ServicoRealizado.removerServico();
+                    Conexao.fecharConexao();
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");
