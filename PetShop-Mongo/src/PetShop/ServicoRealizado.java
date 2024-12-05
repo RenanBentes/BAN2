@@ -1,4 +1,5 @@
 package PetShop;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -15,7 +16,6 @@ public class ServicoRealizado {
     private int idPet;
 
     // Construtor
-
     public ServicoRealizado(int idServico, String data, String status, int idDescricaoServico, int idPet) {
 
         this.idServico = idServico;
@@ -24,8 +24,8 @@ public class ServicoRealizado {
         this.idDescricaoServico = idDescricaoServico;
         this.idPet = idPet;
     }
-    // Getters e Setters
 
+    // Getters e Setters
     public int getIdServico() {
         return idServico;
     }
@@ -102,7 +102,7 @@ public class ServicoRealizado {
         scanner.nextLine(); // Consumir quebra de linha
 
         // Solicitar os outros campos
-        System.out.println("Digite a data do serviço (formato dd/MM/yyyy): ");
+        System.out.println("Digite a data do serviço (formato dd/mm/yyyy): ");
         String data = scanner.nextLine();
 
         // Validar o status do serviço

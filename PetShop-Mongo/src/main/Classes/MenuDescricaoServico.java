@@ -2,7 +2,6 @@ package main.Classes;
 
 import PetShop.DescricaoServico;
 import main.Conexao;
-
 import java.util.Scanner;
 
 public class MenuDescricaoServico {

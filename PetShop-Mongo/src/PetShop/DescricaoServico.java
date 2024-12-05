@@ -116,7 +116,7 @@ public class DescricaoServico {
         } catch (Exception e) {
             System.out.println("Erro ao adicionar descrição de serviço: " + e.getMessage());
         } finally {
-            mongoClient.close(); // Fechar a conexão ao final do método
+            mongoClient.close();
         }
     }
 
@@ -145,7 +145,7 @@ public class DescricaoServico {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o ID da descrição de serviço a ser atualizada: ");
         int idDescricaoServico = scanner.nextInt();
-        scanner.nextLine(); // Consumir o \n após o nextInt()
+        scanner.nextLine();
 
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> descricaoServicoCollection = Conexao.getDatabase().getCollection("DescricaoServico");

@@ -62,7 +62,7 @@ public class Pet {
         System.out.println("Digite o nome do pet: ");
         String nome = scanner.nextLine();
 
-        System.out.println("Digite a data de nascimento do pet (dd/MM/yyyy): ");
+        System.out.println("Digite a data de nascimento do pet (dd/mm/yyyy): ");
         String dataNascimento = scanner.nextLine();
 
         int idPetRaca;

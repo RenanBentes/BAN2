@@ -42,7 +42,7 @@ public class Relatorio {
             System.err.println("Erro ao gerar o relatório: " + e.getMessage());
         } finally {
             if (mongoClient != null) {
-                Conexao.fecharConexao(); // Fechar a conexão
+                Conexao.fecharConexao();
             }
         }
     }
@@ -76,7 +76,7 @@ public class Relatorio {
             // Exibindo os resultados
             System.out.println("Relatório: Serviços Realizados por Pet");
             for (Document doc : resultados) {
-                String petId = doc.get("_id") != null ? doc.get("_id").toString() : "Desconhecido"; // Garantir que o ID seja convertido
+                String petId = doc.get("_id") != null ? doc.get("_id").toString() : "Desconhecido";
                 System.out.printf("Pet ID: %s, Nome: %s, Total de Serviços: %d%n",
                         petId,
                         doc.getString("nomePet"),
@@ -86,7 +86,7 @@ public class Relatorio {
             System.err.println("Erro ao gerar o relatório: " + e.getMessage());
         } finally {
             if (mongoClient != null) {
-                Conexao.fecharConexao(); // Fechar a conexão
+                Conexao.fecharConexao();
             }
         }
     }
@@ -130,7 +130,7 @@ public class Relatorio {
             System.err.println("Erro ao calcular a soma dos valores por serviço: " + e.getMessage());
         } finally {
             if (mongoClient != null) {
-                Conexao.fecharConexao(); // Fecha a conexão
+                Conexao.fecharConexao();
             }
         }
     }
