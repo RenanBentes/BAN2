@@ -74,13 +74,22 @@ public class Pet {
         scanner.nextLine();
 
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
-            MongoCollection<Document> petsCollection = Conexao.getDatabase().getCollection("Pet");
+            MongoDatabase database = Conexao.getDatabase();
+            MongoCollection<Document> petsCollection = database.getCollection("Pet");
+            MongoCollection<Document> clientesCollection = database.getCollection("Cliente");
+
+            // Verificar se o cliente existe na coleção de Clientes
+            Document clienteDoc = clientesCollection.find(new Document("idCliente", idCliente)).first();
+            if (clienteDoc == null) {
+                System.out.println("Erro: Cliente com ID " + idCliente + " não encontrado. Cadastre o cliente antes de adicionar o pet.");
+                return;
+            }
 
             // Obter o maior ID existente
-            int ultimoIdPet = petsCollection.find()
+            Document ultimoPet = petsCollection.find()
                     .sort(new Document("idPet", -1))
-                    .first()
-                    .getInteger("idPet", 0);
+                    .first();
+            int ultimoIdPet = (ultimoPet != null) ? ultimoPet.getInteger("idPet", 0) : 0;
             int novoIdPet = ultimoIdPet + 1;
 
             // Criar o documento do pet

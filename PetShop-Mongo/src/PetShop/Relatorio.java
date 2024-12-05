@@ -92,43 +92,47 @@ public class Relatorio {
         }
     }
 
-
     public static void somaValoresPorServico() {
-        MongoClient mongoClient = null;
-        MongoDatabase database = null;
-        try {
-            // Conectar com o MongoDB
-            mongoClient = Conexao.getMongoClient();
-            database = Conexao.getDatabase();
-
+        try (MongoClient mongoClient = Conexao.getMongoClient()) { // Conexão automática com try-with-resources
+            MongoDatabase database = Conexao.getDatabase();
             MongoCollection<Document> servicosCollection = database.getCollection("ServicoRealizado");
 
             // Realizando a agregação com conversão explícita para Double
             List<Document> resultados = servicosCollection.aggregate(List.of(
-                    new Document("$match", new Document("status", "Concluído")),
-                    new Document("$project", new Document("valor", new Document("$toDouble", "$valor"))), // Converte o valor para Double
+                    new Document("$match", new Document("status", "Concluído")), // Filtra serviços concluídos
+                    new Document("$project", new Document("valor",
+                            new Document("$add", List.of("$valor", 0.0)))), // Converte valor para Double somando 0.0
                     new Document("$group", new Document("_id", "$idDescricaoServico")
-                            .append("total", new Document("$sum", "$valor"))), // Soma feita com valor já convertido para Double
+                            .append("total", new Document("$sum", "$valor"))), // Soma os valores
                     new Document("$lookup", new Document("from", "DescricaoServico")
                             .append("localField", "_id")
                             .append("foreignField", "idDescricaoServico")
-                            .append("as", "descricaoInfo")),
-                    new Document("$project", new Document("descricaoServico", new Document("$arrayElemAt", List.of("$descricaoInfo.servicoDescricao", 0)))
-                            .append("total", 1)),
-                    new Document("$sort", new Document("total", -1)) // Ordenação decrescente
+                            .append("as", "descricaoInfo")), // Junta com a tabela de descrições
+                    new Document("$project", new Document("descricaoServico",
+                            new Document("$arrayElemAt", List.of("$descricaoInfo.servicoDescricao", 0)))
+                            .append("total", 1)), // Extrai a descrição e mantém o total
+                    new Document("$sort", new Document("total", -1)) // Ordena por total (decrescente)
             )).into(new ArrayList<>());
 
             // Exibindo os resultados
             System.out.println("Soma dos valores dos serviços 'Concluídos' por descrição:");
             for (Document doc : resultados) {
-                System.out.printf("Serviço: %s, Total: %.2f%n", doc.getString("descricaoServico"), doc.getDouble("total"));
+                String descricaoServico = doc.getString("descricaoServico");
+                Double total = doc.getDouble("total");
+
+                if (descricaoServico == null || total == null) {
+                    System.out.println("Erro: Documento com dados ausentes.");
+                    continue;
+                }
+
+                System.out.printf("Serviço: %s, Total: %.2f%n", descricaoServico, total);
             }
+        } catch (NumberFormatException e) {
+            System.err.println("Erro ao converter valor para Double: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Erro ao calcular a soma dos valores por serviço: " + e.getMessage());
-        } finally {
-            if (mongoClient != null) {
-                Conexao.fecharConexao(); // Fechar a conexão
-            }
         }
     }
+
+
 }
