@@ -3,7 +3,6 @@ package PetShop;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import main.Conexao;
-
 import java.util.Scanner;
 
 public class Cliente {
@@ -46,7 +45,11 @@ public class Cliente {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        if (validarTelefone(telefone)) {
+            this.telefone = telefone;
+        } else {
+            throw new IllegalArgumentException("Telefone inválido. Deve seguir o formato (xx)9xxxxxxxx.");
+        }
     }
 
     public String getEmail() {
@@ -55,6 +58,11 @@ public class Cliente {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    // Metodo para validar o formato do telefone
+    private static boolean validarTelefone(String telefone) {
+        return telefone.matches("\\(\\d{2}\\)9\\d{8}");
     }
 
     // Verifica se um cliente com o CPF fornecido já existe
@@ -91,6 +99,10 @@ public class Cliente {
 
         System.out.println("Digite o telefone do cliente: ");
         String telefone = scanner.nextLine().trim();
+        if (!validarTelefone(telefone)) {
+            System.out.println("Erro: Telefone inválido. Deve seguir o formato (xx)9xxxxxxxx.");
+            return;
+        }
 
         System.out.println("Digite o email do cliente: ");
         String email = scanner.nextLine().trim();
@@ -155,6 +167,10 @@ public class Cliente {
 
             System.out.println("Novo telefone (deixe em branco para manter o atual): ");
             String telefone = scanner.nextLine().trim();
+            if (!telefone.isEmpty() && !validarTelefone(telefone)) {
+                System.out.println("Erro: Telefone inválido. Deve seguir o formato (xx)9xxxxxxxx.");
+                return;
+            }
             if (telefone.isEmpty()) telefone = clienteDoc.getString("telefone");
 
             System.out.println("Novo email (deixe em branco para manter o atual): ");
