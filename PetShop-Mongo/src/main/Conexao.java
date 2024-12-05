@@ -13,6 +13,8 @@ public class Conexao {
 
     // Obtém o cliente MongoDB, criando-o se necessário
     public static MongoClient getMongoClient() {
+        Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
+        mongoLogger.setLevel(Level.WARNING); // Exibir apenas erros
         if (mongoClient == null) {
             mongoClient = MongoClients.create(URI);
         }
@@ -23,8 +25,8 @@ public class Conexao {
     public static MongoDatabase getDatabase() {
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.WARNING); // Exibir apenas erros
-
         MongoClient client = getMongoClient();
+
         if (client != null) {
             return client.getDatabase(DATABASE_NAME);
         } else {
