@@ -45,7 +45,7 @@ public class Raca {
 
             // Geração automática de ID
             Document ultimaRaca = racasCollection.find().sort(new Document("idPetRaca", -1)).first();
-            int novoId = (ultimaRaca != null) ? ultimaRaca.getInteger("idPetRaca") + 1 : 1;
+            int novoId = (ultimaRaca != null) ? ultimaRaca.getInteger("idPetRaca", 0) + 1 : 1;
 
             Document racaDoc = new Document("idPetRaca", novoId)
                     .append("descricao", descricao);
@@ -64,9 +64,15 @@ public class Raca {
 
             System.out.println("Lista de Raças:");
             for (Document doc : racasCollection.find()) {
-                int id = doc.getInteger("idPetRaca");
+                Integer id = doc.getInteger("idpetraca");
                 String descricao = doc.getString("descricao");
-                System.out.println("ID: " + id + ", Descrição: " + descricao);
+
+                // Verifica se o ID é nulo e substitui por um valor padrão
+                if (id == null) {
+                    System.out.println("Erro: Documento com ID nulo encontrado.");
+                } else {
+                    System.out.println("ID: " + id + ", Descrição: " + descricao);
+                }
             }
         } catch (Exception e) {
             System.err.println("Erro ao listar raças: " + e.getMessage());
@@ -84,7 +90,7 @@ public class Raca {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
-            Document racaDoc = racasCollection.find(new Document("idPetRaca", id)).first();
+            Document racaDoc = racasCollection.find(new Document("idpetraca", id)).first();
             if (racaDoc == null) {
                 System.out.println("Erro: Raça com ID " + id + " não encontrada.");
                 return;
@@ -99,7 +105,7 @@ public class Raca {
             }
 
             Document update = new Document("$set", new Document("descricao", novaDescricao));
-            racasCollection.updateOne(new Document("idPetRaca", id), update);
+            racasCollection.updateOne(new Document("idpetraca", id), update);
             System.out.println("Raça atualizada com sucesso!");
         } catch (Exception e) {
             System.err.println("Erro ao atualizar raça: " + e.getMessage());
@@ -116,7 +122,8 @@ public class Raca {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
-            long deletedCount = racasCollection.deleteOne(new Document("idPetRaca", id)).getDeletedCount();
+            long deletedCount = racasCollection.deleteOne(new Document("\n" +
+                    "idpetraca", id)).getDeletedCount();
             if (deletedCount > 0) {
                 System.out.println("Raça removida com sucesso!");
             } else {
