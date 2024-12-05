@@ -11,7 +11,7 @@ public class DescricaoServico {
     private double valor;
     private int idPetRaca; // Adicionado idPetRaca
 
-    // Construtores
+    // Construtor
     public DescricaoServico(int idDescricaoServico, String servicoDescricao, double valor, int idPetRaca) {
         this.idDescricaoServico = idDescricaoServico;
         this.servicoDescricao = servicoDescricao;

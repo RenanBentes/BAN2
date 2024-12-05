@@ -120,9 +120,12 @@ public class Cliente {
 
             System.out.println("Lista de Clientes:");
             for (Document doc : clientes.find()) {
+                Object cpfObj = doc.get("cpf");
+                long cpf = (cpfObj instanceof Integer) ? ((Integer) cpfObj).longValue() : (Long) cpfObj;
+
                 System.out.println("ID: " + doc.getInteger("idCliente") +
                         ", Nome: " + doc.getString("nome") +
-                        ", CPF: " + String.format("%011d", doc.getLong("cpf")) +
+                        ", CPF: " + String.format("%011d", cpf) +
                         ", Telefone: " + doc.getString("telefone") +
                         ", Email: " + doc.getString("email"));
             }
