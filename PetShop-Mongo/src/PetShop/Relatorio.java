@@ -92,6 +92,7 @@ public class Relatorio {
         }
     }
 
+
     public static void somaValoresPorServico() {
         MongoClient mongoClient = null;
         MongoDatabase database = null;
