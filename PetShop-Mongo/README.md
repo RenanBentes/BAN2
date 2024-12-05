@@ -1,3 +1,10 @@
+Lucas Denoni Zanellato
+Renan Bentes de Oliveira
+Roger de Azevedo
+
+Trabalho de conclusão de disciplina submetido à Universidade do Estado de Santa Catarina como parte dos requisitos para a obtenção da aprovação em Banco de Dados II.
+
+Professora Dra. Rebeca Schroeder Freitas
 
 1.	Apresentação de Aplicação
 
