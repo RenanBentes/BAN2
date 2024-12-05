@@ -107,9 +107,9 @@ public class Relatorio {
                     new Document("$lookup", new Document("from", "DescricaoServico")
                             .append("localField", "_id")
                             .append("foreignField", "idDescricaoServico")
-                            .append("as", "descricaoInfo")), // Junta com a tabela de descrições
+                            .append("as", "DescricaoServico")), // Junta com a tabela de descrições
                     new Document("$project", new Document("descricaoServico",
-                            new Document("$arrayElemAt", List.of("$descricaoInfo.servicoDescricao", 0)))
+                            new Document("$arrayElemAt", List.of("$DescricaoServico.servicoDescricao", 0)))
                             .append("total", 1)), // Extrai a descrição e mantém o total
                     new Document("$sort", new Document("total", -1)) // Ordena por total (decrescente)
             )).into(new ArrayList<>());

@@ -77,15 +77,23 @@ public class Pet {
             MongoDatabase database = Conexao.getDatabase();
             MongoCollection<Document> petsCollection = database.getCollection("Pet");
             MongoCollection<Document> clientesCollection = database.getCollection("Cliente");
+            MongoCollection<Document> racasCollection = database.getCollection("Raca");
 
-            // Verificar se o cliente existe na coleção de Clientes
+            // Validar se o cliente existe
             Document clienteDoc = clientesCollection.find(new Document("idCliente", idCliente)).first();
             if (clienteDoc == null) {
-                System.out.println("Erro: Cliente com ID " + idCliente + " não encontrado. Cadastre o cliente antes de adicionar o pet.");
+                System.out.println("Erro: Cliente com ID " + idCliente + " não encontrado. O pet não pode ser cadastrado.");
                 return;
             }
 
-            // Obter o maior ID existente
+            // Validar se a raça existe
+            Document racaDoc = racasCollection.find(new Document("idPetRaca", idPetRaca)).first();
+            if (racaDoc == null) {
+                System.out.println("Erro: Raça com ID " + idPetRaca + " não encontrada. O pet não pode ser cadastrado.");
+                return;
+            }
+
+            // Obter o maior ID existente para criar um novo
             Document ultimoPet = petsCollection.find()
                     .sort(new Document("idPet", -1))
                     .first();

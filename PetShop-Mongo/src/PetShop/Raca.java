@@ -62,9 +62,16 @@ public class Raca {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
+            // Verifica se a coleção está vazia
+            long totalRacas = racasCollection.countDocuments();
+            if (totalRacas == 0) {
+                System.out.println("Não existem raças cadastradas.");
+                return;
+            }
+
             System.out.println("Lista de Raças:");
             for (Document doc : racasCollection.find()) {
-                Integer id = doc.getInteger("idpetraca");
+                Integer id = doc.getInteger("idPetRaca");
                 String descricao = doc.getString("descricao");
 
                 // Verifica se o ID é nulo e substitui por um valor padrão
@@ -79,6 +86,7 @@ public class Raca {
         }
     }
 
+
     // Atualiza uma raça pelo ID
     public static void atualizarRaca() {
         Scanner scanner = new Scanner(System.in);
@@ -90,7 +98,7 @@ public class Raca {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
-            Document racaDoc = racasCollection.find(new Document("idpetraca", id)).first();
+            Document racaDoc = racasCollection.find(new Document("idPetRaca", id)).first();
             if (racaDoc == null) {
                 System.out.println("Erro: Raça com ID " + id + " não encontrada.");
                 return;
@@ -105,7 +113,7 @@ public class Raca {
             }
 
             Document update = new Document("$set", new Document("descricao", novaDescricao));
-            racasCollection.updateOne(new Document("idpetraca", id), update);
+            racasCollection.updateOne(new Document("idPetRaca", id), update);
             System.out.println("Raça atualizada com sucesso!");
         } catch (Exception e) {
             System.err.println("Erro ao atualizar raça: " + e.getMessage());
@@ -122,8 +130,7 @@ public class Raca {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoCollection<Document> racasCollection = mongoClient.getDatabase("PetShop").getCollection("Raca");
 
-            long deletedCount = racasCollection.deleteOne(new Document("\n" +
-                    "idpetraca", id)).getDeletedCount();
+            long deletedCount = racasCollection.deleteOne(new Document("idPetRaca", id)).getDeletedCount();
             if (deletedCount > 0) {
                 System.out.println("Raça removida com sucesso!");
             } else {
