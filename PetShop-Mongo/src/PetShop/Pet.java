@@ -65,32 +65,41 @@ public class Pet {
         System.out.println("Digite a data de nascimento do pet (dd/MM/yyyy): ");
         String dataNascimento = scanner.nextLine();
 
-        System.out.println("Digite o ID da raça do pet: ");
-        int idPetRaca = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.println("Digite o ID do cliente: ");
-        int idCliente = scanner.nextInt();
-        scanner.nextLine();
+        int idPetRaca;
+        int idCliente;
 
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
             MongoDatabase database = Conexao.getDatabase();
-            MongoCollection<Document> petsCollection = database.getCollection("Pet");
-            MongoCollection<Document> clientesCollection = database.getCollection("Cliente");
             MongoCollection<Document> racasCollection = database.getCollection("Raca");
+            MongoCollection<Document> clientesCollection = database.getCollection("Cliente");
+            MongoCollection<Document> petsCollection = database.getCollection("Pet");
 
-            // Validar se o cliente existe
-            Document clienteDoc = clientesCollection.find(new Document("idCliente", idCliente)).first();
-            if (clienteDoc == null) {
-                System.out.println("Erro: Cliente com ID " + idCliente + " não encontrado. O pet não pode ser cadastrado.");
-                return;
+            // Validação do ID da raça
+            while (true) {
+                System.out.println("Digite o ID da raça do pet: ");
+                idPetRaca = scanner.nextInt();
+                scanner.nextLine(); // Limpa o buffer
+
+                Document racaDoc = racasCollection.find(new Document("idPetRaca", idPetRaca)).first();
+                if (racaDoc != null) {
+                    break; // Raça válida, continua o processo
+                } else {
+                    System.out.println("Erro: Raça com ID " + idPetRaca + " não encontrada. Tente novamente.");
+                }
             }
 
-            // Validar se a raça existe
-            Document racaDoc = racasCollection.find(new Document("idPetRaca", idPetRaca)).first();
-            if (racaDoc == null) {
-                System.out.println("Erro: Raça com ID " + idPetRaca + " não encontrada. O pet não pode ser cadastrado.");
-                return;
+            // Validação do ID do cliente
+            while (true) {
+                System.out.println("Digite o ID do cliente: ");
+                idCliente = scanner.nextInt();
+                scanner.nextLine(); // Limpa o buffer
+
+                Document clienteDoc = clientesCollection.find(new Document("idCliente", idCliente)).first();
+                if (clienteDoc != null) {
+                    break; // Cliente válido, continua o processo
+                } else {
+                    System.out.println("Erro: Cliente com ID " + idCliente + " não encontrado. Tente novamente.");
+                }
             }
 
             // Obter o maior ID existente para criar um novo
@@ -109,10 +118,12 @@ public class Pet {
 
             petsCollection.insertOne(petDoc);
             System.out.println("Pet adicionado com sucesso! ID: " + novoIdPet);
+
         } catch (Exception e) {
             System.err.println("Erro ao adicionar o pet: " + e.getMessage());
         }
     }
+
 
     public static void listarPets() {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {

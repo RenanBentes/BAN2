@@ -13,7 +13,6 @@ public class Relatorio {
         MongoClient mongoClient = null;
         MongoDatabase database = null;
         try {
-            // Conectar com o MongoDB
             mongoClient = Conexao.getMongoClient();
             database = Conexao.getDatabase();
 
@@ -52,7 +51,7 @@ public class Relatorio {
         MongoClient mongoClient = null;
         MongoDatabase database = null;
         try {
-            // Conectar com o MongoDB
+
             mongoClient = Conexao.getMongoClient();
             database = Conexao.getDatabase();
 
@@ -93,31 +92,31 @@ public class Relatorio {
     }
 
     public static void somaValoresPorServico() {
-        try (MongoClient mongoClient = Conexao.getMongoClient()) { // Conexão automática com try-with-resources
-            MongoDatabase database = Conexao.getDatabase();
+        MongoClient mongoClient = null;
+        MongoDatabase database = null;
+        try {
+            mongoClient = Conexao.getMongoClient();
+            database = Conexao.getDatabase();
+
             MongoCollection<Document> servicosCollection = database.getCollection("ServicoRealizado");
 
-            // Realizando a agregação com conversão explícita para Double
+            // Realizando a agregação com agrupamento duplo para consolidar os valores
             List<Document> resultados = servicosCollection.aggregate(List.of(
                     new Document("$match", new Document("status", "Concluído")), // Filtra serviços concluídos
-                    new Document("$project", new Document("valor",
-                            new Document("$add", List.of("$valor", 0.0)))), // Converte valor para Double somando 0.0
-                    new Document("$group", new Document("_id", "$idDescricaoServico")
-                            .append("total", new Document("$sum", "$valor"))), // Soma os valores
                     new Document("$lookup", new Document("from", "DescricaoServico")
-                            .append("localField", "_id")
+                            .append("localField", "idDescricaoServico")
                             .append("foreignField", "idDescricaoServico")
-                            .append("as", "DescricaoServico")), // Junta com a tabela de descrições
-                    new Document("$project", new Document("descricaoServico",
-                            new Document("$arrayElemAt", List.of("$DescricaoServico.servicoDescricao", 0)))
-                            .append("total", 1)), // Extrai a descrição e mantém o total
+                            .append("as", "descricaoInfo")), // Junta com a tabela de descrições
+                    new Document("$unwind", "$descricaoInfo"), // Desfaz o array para acessar diretamente os valores
+                    new Document("$group", new Document("_id", "$descricaoInfo.servicoDescricao")
+                            .append("total", new Document("$sum", "$descricaoInfo.valor"))), // Soma os valores agrupados por descrição
                     new Document("$sort", new Document("total", -1)) // Ordena por total (decrescente)
             )).into(new ArrayList<>());
 
             // Exibindo os resultados
-            System.out.println("Soma dos valores dos serviços 'Concluídos' por descrição:");
+            System.out.println("Relatório: Soma Consolidada dos Valores dos Serviços Concluídos");
             for (Document doc : resultados) {
-                String descricaoServico = doc.getString("descricaoServico");
+                String descricaoServico = doc.getString("_id");
                 Double total = doc.getDouble("total");
 
                 if (descricaoServico == null || total == null) {
@@ -127,12 +126,13 @@ public class Relatorio {
 
                 System.out.printf("Serviço: %s, Total: %.2f%n", descricaoServico, total);
             }
-        } catch (NumberFormatException e) {
-            System.err.println("Erro ao converter valor para Double: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Erro ao calcular a soma dos valores por serviço: " + e.getMessage());
+        } finally {
+            if (mongoClient != null) {
+                Conexao.fecharConexao(); // Fecha a conexão
+            }
         }
     }
-
 
 }

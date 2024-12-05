@@ -60,32 +60,67 @@ public class DescricaoServico {
     public static void adicionarDescricaoServico() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Digite o ID da descrição do serviço: ");
-        int idDescricaoServico = scanner.nextInt();
-        scanner.nextLine(); // Consumir o \n após o nextInt()
+        // Conexão com o MongoDB
+        MongoClient mongoClient = Conexao.getMongoClient();
+        MongoDatabase database = Conexao.getDatabase();
+        MongoCollection<Document> descricaoServicoCollection = database.getCollection("DescricaoServico");
 
+        // Solicitar os dados ao usuário
         System.out.println("Digite a descrição do serviço: ");
         String descricao = scanner.nextLine();
 
         System.out.println("Digite o valor do serviço: ");
         double valor = scanner.nextDouble();
 
-        System.out.println("Digite o ID da raça: ");
-        int idPetRaca = scanner.nextInt();
+        // Validar o ID da raça como inteiro
+        int idPetRaca = -1;
+        while (idPetRaca == -1) {
+            System.out.println("Digite o ID da raça: ");
+            idPetRaca = scanner.nextInt();
 
-        DescricaoServico descricaoServico = new DescricaoServico(idDescricaoServico, descricao, valor, idPetRaca);
-        Document descricaoDoc = new Document("idDescricaoServico", descricaoServico.getIdDescricaoServico())
-                .append("servicoDescricao", descricaoServico.getServicoDescricao())
-                .append("valor", descricaoServico.getValor())
-                .append("idPetRaca", descricaoServico.getIdPetRaca());
+            // Verificar se o ID da raça existe na coleção
+            MongoCollection<Document> racaCollection = database.getCollection("Raca");
 
-        // Conexão com o MongoDB
-        try (MongoClient mongoClient = Conexao.getMongoClient()) {
-            MongoCollection<Document> descricaoServicoCollection = Conexao.getDatabase().getCollection("DescricaoServico");
+            // Consultar pela raça usando o ID como inteiro
+            Document racaDoc = racaCollection.find(new Document("idPetRaca", idPetRaca)).first();
+
+            if (racaDoc != null) {
+                // Raça encontrada, não imprimir nada
+                break; // ID válido, continuar
+            } else {
+                System.out.println("Erro: Raça com ID " + idPetRaca + " não encontrada. Tente novamente.");
+                idPetRaca = -1; // Continuar solicitando o ID até encontrar
+            }
+        }
+
+        // Gerar um novo ID incremental para DescricaoServico
+        int novoIdDescricaoServico;
+        try {
+            // Buscar o último ID inserido na coleção
+            Document ultimoServico = descricaoServicoCollection.find()
+                    .sort(new Document("idDescricaoServico", -1)) // Buscar o maior ID existente
+                    .first();
+
+            // Calcular o novo ID incremental
+            novoIdDescricaoServico = (ultimoServico != null) ? ultimoServico.getInteger("idDescricaoServico") + 1 : 1;
+
+            // Criar o documento da descrição do serviço
+            Document descricaoDoc = new Document("idDescricaoServico", novoIdDescricaoServico)
+                    .append("servicoDescricao", descricao)
+                    .append("valor", valor)
+                    .append("idPetRaca", idPetRaca); // Armazenar o ID da raça como inteiro
+
+            // Inserir o novo documento no banco de dados
             descricaoServicoCollection.insertOne(descricaoDoc);
-            System.out.println("Descrição de serviço adicionada com sucesso!");
+            System.out.println("Descrição de serviço adicionada com sucesso!"); // Não imprimir o documento da raça
+        } catch (Exception e) {
+            System.out.println("Erro ao adicionar descrição de serviço: " + e.getMessage());
+        } finally {
+            mongoClient.close(); // Fechar a conexão ao final do método
         }
     }
+
+
 
     public static void listarDescricoesServico() {
         try (MongoClient mongoClient = Conexao.getMongoClient()) {
@@ -160,4 +195,3 @@ public class DescricaoServico {
         }
     }
 }
-
