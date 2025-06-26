@@ -43,7 +43,7 @@ O sistema foi projetado para ser didático e modular, servindo tanto como uma so
 ### Ferramentas Utilizadas
 
 - **IntelliJ IDEA:** IDE recomendada para desenvolvimento Java.
-- **Java Development Kit (JDK):** Versão 8 ou superior.
+- **Java Development Kit (JDK):** Versão 22 ou superior.
 - **MongoDB:** Banco de dados NoSQL (utilize MongoDB Compass para facilitar a visualização e administração).
 
 ### Configuração do Ambiente
@@ -57,7 +57,7 @@ O sistema foi projetado para ser didático e modular, servindo tanto como uma so
 2. **Aplicação:**
    - Abra o projeto no IntelliJ IDEA.
    - Configure a classe `Conexao` com os dados de conexão do seu MongoDB local.
-   - Compile o projeto com o JDK 8+.
+   - Compile o projeto com o JDK 22+.
 
 ### Execução
 
@@ -71,28 +71,6 @@ O sistema foi projetado para ser didático e modular, servindo tanto como uma so
 - **Total de Pets por Cliente:** Mostra todos os clientes com a quantidade de pets cadastrados.
 - **Serviços por Pets:** Mostra a quantidade de serviços realizados para cada pet.
 - **Receita de Serviços:** Apresenta a soma dos valores arrecadados por todos os serviços concluídos, agrupados por tipo de serviço.
-
----
-
-## Estrutura do Projeto
-
-```
-PetShop-Mongo/
-├── src/
-│   ├── main/
-│   │   ├── java/           # Código-fonte Java
-│   │   └── resources/      # Arquivos .csv para importação
-├── compass-connections.json
-├── README.md
-```
-
----
-
-## Contribuição
-
-Este projeto foi realizado para fins acadêmicos, mas contribuições e sugestões são bem-vindas. Sinta-se livre para abrir issues ou pull requests.
-
----
 
 ## Licença
 
