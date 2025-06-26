@@ -1,41 +1,99 @@
-Lucas Denoni Zanellato
-Renan Bentes de Oliveira
-Roger de Azevedo
+# PetShop-Mongo
 
-Trabalho de conclusão de disciplina submetido à Universidade do Estado de Santa Catarina como parte dos requisitos para a obtenção da aprovação em Banco de Dados II.
+Projeto desenvolvido por:
+- Lucas Denoni Zanellato
+- Renan Bentes de Oliveira
+- Roger de Azevedo
 
-Professora Dra. Rebeca Schroeder Freitas
+Trabalho de conclusão de disciplina submetido à Universidade do Estado de Santa Catarina (UDESC) como parte dos requisitos para a aprovação em Banco de Dados II.
 
-1.	Apresentação de Aplicação
+**Professora:** Dra. Rebeca Schroeder Freitas
 
-O sistema PetShop permite o gerenciamento de operações de um pet shop, podendo cadastrar, listar, atualizar e remover de clientes, pets, raças, serviço realizados e descrição de serviços realizados pelo pet shop e relatórios gerenciais.
+---
 
-2.	Instruções para Compilação e Execução da Aplicação
+## Sobre o Projeto
 
-Detalharemos as instruções necessárias para compilar e executar a aplicação, utilizando o Intellij como IDE e MongoDB como banco de dados.
+O **PetShop-Mongo** é um sistema de gerenciamento para pet shops, desenvolvido em Java, com persistência de dados utilizando o banco NoSQL MongoDB. O projeto tem como objetivo facilitar a administração de um pet shop, permitindo um controle eficiente de clientes, pets, raças, serviços realizados e descrições de serviços.
 
-2.1 Ferramentas utilizadas
+O sistema foi projetado para ser didático e modular, servindo tanto como uma solução prática quanto como uma base para estudos em bancos de dados NoSQL e aplicações Java.
 
-- IntelliJ IDEA - IDE para desenvolvimento em Java.
-- Java Development Kit (JDK) - A aplicação foi desenvolvida usando o JDK 8 ou superior.
-- MongoDB - Banco de dados NoSQL usado para armazenar as informações.
+### Principais Funcionalidades
 
-2.2 Execução
+- **Gerenciamento de Clientes:** Cadastro, listagem, atualização e remoção.
+- **Gerenciamento de Pets:** Cadastro, listagem, atualização e remoção, com associação aos clientes.
+- **Gerenciamento de Raças:** Controle das raças de pets cadastradas.
+- **Serviços Realizados:** Controle dos serviços executados para cada pet.
+- **Descrição de Serviços:** Cadastro dos tipos de serviços oferecidos.
+- **Relatórios automatizados:**
+  - Total de pets por cliente.
+  - Quantidade de serviços realizados por pet.
+  - Receita total arrecadada por tipo de serviço concluído.
 
-Após configurar a classe ‘Conexao’ na IDE, necessário configurar o localhost no MongoDB Compass, que por sua vez está acessível pela porta padrão 27017. A aplicação é executada através do arquivo SistemaGerencial.java.
-A Database foi criada utilizando o arquivo compass-connections.json, e as coleções foram feitas usando do import dos arquivos .csv presentes do repositório (caminho: BAN2/PetShop-Mongo/src/main/Tabelas/).
-Ao executá-la, o menu principal é exibido, com as seguintes opções: Gerenciar Clientes, Pets, Raças, Serviços Realizados e Descrição de Serviços. Cada uma das categorias possui as opções de adicionar, listar, editar e remover entradas. O menu também possui a opção de Relatórios.
+### Diferenciais do Projeto
 
-3.	Relatórios
+- Utilização de MongoDB, demonstrando integração de Java com banco de dados NoSQL.
+- Estrutura modular, facilitando manutenção e expansão.
+- Importação de dados por arquivos `.csv` para rápida inicialização do banco.
+- Interface em menu textual de fácil navegação e uso.
 
-Relatório 1: Total de Pets por Cliente
+---
 
-Este relatório exibe todos os clientes e a quantidade de pets cadastrados em cada um, juntando as tabelas de Pet e Cliente.
+## Instruções para Compilação e Execução
 
-Relatório 2: Serviços por Pets
+### Ferramentas Utilizadas
 
-Este relatório exibe a quantidade de serviços realizados para cada pet, juntando as tabelas Pet e ServicoRealizado.
+- **IntelliJ IDEA:** IDE recomendada para desenvolvimento Java.
+- **Java Development Kit (JDK):** Versão 8 ou superior.
+- **MongoDB:** Banco de dados NoSQL (utilize MongoDB Compass para facilitar a visualização e administração).
 
-Relatório 3: Receita de Serviços
+### Configuração do Ambiente
 
-Este relatório exibe a soma dos valores arrecados por todos os serviços que foram concluídos (Status Concluído), agrupados pela descrição de cada serviço, juntando as tabelas ServicoRealizado e DescricaoServico.
+1. **Banco de Dados:**
+   - Instale o MongoDB e/ou utilize o MongoDB Compass.
+   - Configure o acesso padrão em `localhost:27017`.
+   - Utilize o arquivo `compass-connections.json` incluído no projeto para criar a database.
+   - Importe os arquivos `.csv` localizados em `PetShop-Mongo/src/main/resources` para popular as coleções iniciais.
+
+2. **Aplicação:**
+   - Abra o projeto no IntelliJ IDEA.
+   - Configure a classe `Conexao` com os dados de conexão do seu MongoDB local.
+   - Compile o projeto com o JDK 8+.
+
+### Execução
+
+- Execute a aplicação pela classe principal.
+- O menu principal será exibido, permitindo o acesso a todas as funcionalidades do sistema.
+
+---
+
+## Relatórios Disponíveis
+
+- **Total de Pets por Cliente:** Mostra todos os clientes com a quantidade de pets cadastrados.
+- **Serviços por Pets:** Mostra a quantidade de serviços realizados para cada pet.
+- **Receita de Serviços:** Apresenta a soma dos valores arrecadados por todos os serviços concluídos, agrupados por tipo de serviço.
+
+---
+
+## Estrutura do Projeto
+
+```
+PetShop-Mongo/
+├── src/
+│   ├── main/
+│   │   ├── java/           # Código-fonte Java
+│   │   └── resources/      # Arquivos .csv para importação
+├── compass-connections.json
+├── README.md
+```
+
+---
+
+## Contribuição
+
+Este projeto foi realizado para fins acadêmicos, mas contribuições e sugestões são bem-vindas. Sinta-se livre para abrir issues ou pull requests.
+
+---
+
+## Licença
+
+Projeto desenvolvido como parte de atividade acadêmica. Consulte os autores para outros usos.
