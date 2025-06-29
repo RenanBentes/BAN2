@@ -1,117 +1,114 @@
-# 📝 Projeto de Integração Node.js + MongoDB com Docker
+# 📝 Integração Node.js + MongoDB com Docker
 
-Este projeto demonstra como conectar uma aplicação Node.js a um banco de dados MongoDB em container Docker.
+Este projeto demonstra como conectar uma aplicação Node.js a um banco de dados MongoDB executando em um container Docker, com exemplos práticos de criação de coleção, inserção, consulta e atualização de documentos.
 
-## 📋 Arquivos do Projeto
+## 📁 Arquivos do Projeto
 
-- `docker-compose-mongo.yml` - Configuração do container MongoDB
-- `Teste.js` - Aplicação Node.js de exemplo
-- `package.json` - Dependências do projeto
-- `package-lock.json` - Versões exatas das dependências
+- `docker-compose-mongo.yml` — Configuração do container MongoDB via Docker Compose.
+- `Teste.js` — Script Node.js de exemplo com operações CRUD no MongoDB.
+- `package.json` / `package-lock.json` — Gerenciamento e bloqueio das dependências do projeto.
+- `README.md` — Documentação do projeto.
 
 ## 🚀 Pré-requisitos
 
-- Docker e Docker Compose instalados
-- Node.js 16.20.1 ou superior
-- NPM ou Yarn
+- Docker e Docker Compose instalados na máquina.
+- Node.js 16.20.1 ou superior.
+- NPM ou Yarn.
 
-## 🐳 Configuração do MongoDB
+## 🐳 Subindo o MongoDB com Docker
 
-O arquivo `docker-compose-mongo.yml` configura um container MongoDB.
+O arquivo `docker-compose-mongo.yml` configura um container MongoDB com as seguintes características:
 
-**Características:**
-- Usuário admin: `User` / Senha: `mongo`
-- Persistência de dados via volume Docker (`mongodb_data`)
-- Porta 27017 exposta
-- Rede bridge personalizada para isolamento
-- Reinicialização automática
+- **Usuário root:** `User`  
+- **Senha root:** `mongo`
+- **Persistência:** Volume Docker `mongodb_data`
+- **Porta exposta:** 27017
+- **Reinício automático:** sempre que necessário
 
-## ⚙️ Configuração da Aplicação
+Para iniciar o MongoDB via Docker Compose:
 
-O projeto está configurado para conectar ao MongoDB com as seguintes configurações:
+```bash
+docker-compose -f docker-compose-mongo.yml up -d
+```
 
-- **URL de conexão**: `mongodb://User:mongo@localhost:27017`
-- **Banco de dados**: `testdb`
-- **Coleção**: `Teste`
-- **Usuário**: `User`
-- **Senha**: `mongo`
+## ⚙️ Configuração da Aplicação Node.js
 
-## 📦 Dependências
+O script `Teste.js` está configurado para conectar ao MongoDB com os parâmetros:
 
-- **mongodb**: ^6.17.0 - Driver oficial do MongoDB para Node.js
+- **URL de conexão:** `mongodb://User:mongo@localhost:27017`
+- **Banco de dados:** `testdb`
+- **Coleção:** `Teste`
 
-### Instalação das Dependências
+> Para personalizar, edite o objeto `config` no início do arquivo `Teste.js`:
+
+```javascript
+const config = {
+  url: 'mongodb://User:mongo@localhost:27017',
+  dbName: 'testdb',
+  collectionName: 'Teste'
+};
+```
+
+## 📦 Instalação das Dependências
+
+Instale as dependências Node.js do projeto:
 
 ```bash
 npm install
 ```
 
-## 🎯 Funcionalidades
+## 🎯 Funcionalidades Demonstradas
 
-O script `Teste.js` demonstra as seguintes operações:
+O script `Teste.js` executa automaticamente:
 
-1. **Conexão** com o banco MongoDB
-2. **Criação** de uma nova coleção
-3. **Inserção** de um documento de teste
-4. **Consulta** para verificar os dados inseridos
-5. **Fechamento** da conexão
+1. **Conexão** ao MongoDB.
+2. **Criação** da coleção, se não existir.
+3. **Inserção** de um documento de teste.
+4. **Atualização** do documento inserido.
+5. **Consulta** de todos os documentos da coleção.
+6. **Consulta filtrada** para documentos com campo `ativo: true`.
+7. **Fechamento** seguro da conexão.
 
-### Exemplo de Documento Inserido
+### Exemplo de documento inserido
 
 ```javascript
 {
   nome: "Documento de Teste",
   valor: 123.45,
-  dataCriacao: new Date(),
+  dataCriacao: <data atual>,
   ativo: true,
-  tags: ["teste", "javascript", "mongodb"]
+  tags: ["teste", "javascript", "mongodb"],
+  versao: "1.0"
 }
 ```
 
-## 🏃‍♂️ Como Executar
+Após atualização, o campo `versao` passa a ser `"1.1"` e um campo `dataAtualizacao` é adicionado.
 
-### Método: Usando Docker 
+## 🏃‍♂️ Como Executar o Projeto
 
-1. **Instale as dependências:**
-```bash
-npm install
-```
+1. Instale as dependências:
 
-2. **Inicie o MongoDB:**
-```bash
-docker-compose -f docker-compose-mongo.yml up -d
-```
+   ```bash
+   npm install
+   ```
 
-3. **Execute o script Node.js:**
-```bash
-node Teste.js
-```
+2. Inicie o MongoDB:
 
-## 🔧 Personalização
+   ```bash
+   docker-compose -f docker-compose-mongo.yml up -d
+   ```
 
-Para adaptar o projeto às suas necessidades, modifique as configurações no início do arquivo `Teste.js`:
+3. Execute o script Node.js:
 
-```javascript
-const config = {
-  url: 'mongodb://seu_usuario:sua_senha@localhost:27017',
-  dbName: 'seu_banco_de_dados',
-  collectionName: 'sua_colecao'
-};
-```
-
-## 📝 Estrutura do Projeto
-
-```
-├── package.json               # Dependências e configurações do npm
-├── package-lock.json          # Lock file das dependências
-├── docker-compose-mongo.yml   # Configuração Docker para MongoDB
-├── Teste.js                   # Script principal de demonstração
-└── README.md                  # Este arquivo
-```
+   ```bash
+   node Teste.js
+   ```
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Node.js** - Runtime JavaScript
-- **MongoDB** - Banco de dados NoSQL
-- **MongoDB Driver** - Driver oficial para Node.js
-- **Docker & Docker Compose** - Containerização e orquestração
+- **Node.js** — Runtime JavaScript
+- **MongoDB** — Banco de dados NoSQL
+- **mongodb** — Driver oficial do MongoDB para Node.js
+- **Docker & Docker Compose** — Containerização e orquestração
+
+---
